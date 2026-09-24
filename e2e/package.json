@@ -1,0 +1,12 @@
+{
+  "name": "train-travel-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Puppeteer journey through the UI against the gateway and WireMock Cloud mocks",
+  "scripts": {
+    "journey": "node journey.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.12.0"
+  }
+}

@@ -2,6 +2,9 @@
 .gradle/
 build/
 
+# Node (the ui/ and e2e/ projects keep their own installs)
+node_modules/
+
 # IDEs
 .idea/
 *.iml
