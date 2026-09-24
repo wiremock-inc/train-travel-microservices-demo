@@ -1,7 +1,8 @@
 # Train Travel Microservices — demo gateway
 
 A Spring Boot (Kotlin) gateway implementing the [Train Travel API](train-travel-openapi.yaml), backed by
-**four invented external microservices — all of them mocked in WireMock Cloud**:
+**four invented external microservices — all of them mocked in WireMock Cloud** — with a bundled
+SolidJS UI that consumes the API end-to-end, including real OAuth login against the mocked Google IdP:
 
 | Downstream | Flavour | WireMock Cloud mock API | Techniques showcased |
 |---|---|---|---|
@@ -19,8 +20,9 @@ definitions live in [`mock-estate/`](mock-estate/) (OpenAPI descriptions + stub 
 
 - Java 21+ (the Gradle wrapper needs Java 24 or lower to *run*; compilation targets a Java 21 toolchain)
 - The WireMock Cloud mock estate above (already deployed — the IDs above are live)
+- Node 20+ with [pnpm](https://pnpm.io) — only if you want the UI and/or the browser E2E
 
-## Run it
+## Run it (gateway)
 
 ```bash
 ./gradlew bootRun
@@ -33,6 +35,65 @@ see [`src/main/resources/application.yml`](src/main/resources/application.yml).
 > `https://5e5y3.wiremockapi.cloud`, and the IdP stamps the token's `iss` from whatever base URL issued it.
 > Get your tokens from that exact URL (as the script below does) or adjust
 > `spring.security.oauth2.resourceserver.jwt.issuer-uri` to match.
+
+## The UI app
+
+A SolidJS + Vite single-page app ([`ui/`](ui/), originally
+[wiremock-inc/Train-travel-demo-UI](https://github.com/wiremock-inc/Train-travel-demo-UI)) that talks to
+the gateway through the APIMatic-generated `@wiremock-inc/apimatic-sdkgen-demo` SDK.
+
+### Run it
+
+With the gateway already running on `localhost:8080`:
+
+```bash
+cd ui
+pnpm install
+pnpm dev          # http://localhost:3000
+```
+
+The app defaults to `http://localhost:8080` for its API host; the navbar's "Override API host" input
+points it elsewhere, and **Reset** returns to the default.
+
+> The SDK is patched via `ui/patches/` (see the commit history for the reasons: an https-only base URI
+> and a `cvc`-required response schema both conflict with the API spec). pnpm applies the patch on
+> `install`; if you ever edit it, `pnpm patch-commit` then **restart `pnpm dev`** — Vite's dependency
+> cache only re-optimizes at startup.
+
+### Using the app
+
+1. **Log in** (navbar, top right). The browser redirects to the mock Google sign-in page — enter any
+   email, click *Continue* — and you're back, logged in with a scoped JWT stored in `localStorage`
+   (sessions survive refreshes; **Log out** clears the token).
+2. **Book a trip**: pick two stations (e.g. Berlin Hauptbahnhof → München Hauptbahnhof) and a future
+   date; the trips table lists available connections. Click **Book** on one, fill in the passenger
+   name, optionally tick bicycle/dog, and submit.
+3. **Pay**: on the payment page, any card number is approved by the PayRail mock — except
+   `4000 0000 0000 0002`, which is declined: the error panel shows the gateway's actual decline
+   reason (*"Payment was declined by the payment provider (card_declined)"*) and the booking stays
+   payable, so you can succeed with `4242 4242 4242 4242` (or anything else) straight after.
+4. **My bookings** lists your (and only your) bookings — delete to release a hold.
+
+Every UI click exercises the same mocked stack as the curl walkthrough below: stations/trips from the
+CSV data-driven mocks, bookings from the per-user stateful mock, payments through the PayRail SOAP
+mock, and the login JWT comes from the same mocked Google IdP.
+
+## Browser E2E
+
+[`e2e/journey.mjs`](e2e/journey.mjs) drives a real Chrome (via `puppeteer-core`) through the whole
+journey: log in via the mock IdP → find trips → book → declined card → approved payment →
+My bookings → delete → log out.
+
+```bash
+cd e2e
+pnpm install
+node journey.mjs
+```
+
+Requires the gateway on `:8080`, the UI dev server on `:3000`, and Chrome installed at the standard
+location. Chrome is launched with `--no-sandbox` (an automated instance alongside your normal Chrome
+can't bootstrap its own sandbox). Expect `=== JOURNEY PASSED ===` and exactly one ≥400 response —
+the deliberately declined payment.
 
 ## The demo walkthrough (curl)
 
@@ -174,6 +235,8 @@ src/main/kotlin/com/wiremock/traintravel/
   webhook/     newBooking outbound webhook → Webhook Receiver mock
 src/main/resources/payrail.wsdl      contract-first WSDL; JAXB classes generated at build time
 mock-estate/                         OpenAPI descriptions + stub sets for the WireMock Cloud mocks
+ui/                                  SolidJS UI (Vite, :3000) - OAuth login, booking and payment flows
+e2e/                                 Puppeteer browser journey against the running stack
 docs/train-travel-microservices/     full specification documents
 postman/                             collection + environment
 ```
