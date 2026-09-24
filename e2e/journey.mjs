@@ -8,6 +8,9 @@
  * turn talks only to WireMock Cloud mocks. Requires:
  *   - the UI dev server on localhost:3000
  *   - the gateway on localhost:8080
+ *
+ * The browser window is visible by default so the run can be watched; pass
+ * --headless to run without a window (e.g. in CI).
  */
 
 import fs from 'node:fs';
@@ -24,7 +27,7 @@ fs.rmSync(PROFILE_DIR, { recursive: true, force: true });
 
 const browser = await puppeteer.launch({
   executablePath: CHROME,
-  headless: 'new',
+  headless: process.argv.includes('--headless'),
   userDataDir: PROFILE_DIR,
   args: ['--no-first-run', '--no-default-browser-check', '--no-sandbox'],
 });
@@ -184,12 +187,16 @@ step('pay again with the approved card');
 await page.$eval('#cardNumber', (el) => (el.value = ''));
 await page.type('#cardNumber', '4242424242424242');
 await clickButton('Pay');
-await new Promise((r) => setTimeout(r, 2500));
-console.log('PANEL:', await page.evaluate(() => document.querySelector('.bg-red-700')?.textContent ?? document.querySelector('.bg-green-700')?.textContent ?? '(no panel)'));
 await waitFor(
   () => document.body.textContent.includes('Payment complete'),
   20000,
   'payment success panel',
+);
+console.log(
+  'PANEL:',
+  await page.evaluate(
+    () => document.querySelector('.bg-green-700')?.textContent ?? '(no panel)',
+  ),
 );
 const paymentRef = await page.evaluate(() => {
   const match = document.body.textContent.match(/payment reference is:\s*([0-9a-f-]+)/);

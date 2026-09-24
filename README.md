@@ -92,6 +92,9 @@ pnpm install
 node journey.mjs
 ```
 
+The browser window is **visible by default** — you can watch the whole journey play out in a real
+Chrome. Pass `--headless` to run without a window (e.g. in CI).
+
 Requires the gateway on `:8080`, the UI dev server on `:3000`, and Chrome installed at the standard
 location. Chrome is launched with `--no-sandbox` (an automated instance alongside your normal Chrome
 can't bootstrap its own sandbox). Expect `=== JOURNEY PASSED ===` and exactly one ≥400 response —
