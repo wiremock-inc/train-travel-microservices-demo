@@ -8,6 +8,9 @@ import {
 } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { createEffect, createSignal } from 'solid-js';
 
+/** The gateway this UI is shipped against (Spring Boot, plain HTTP on port 8080). */
+export const DEFAULT_HOST = 'http://localhost:8080';
+
 const [host, setHost] = createSignal<string | false>(false);
 
 let client;
@@ -32,6 +35,8 @@ createEffect(() => {
 
   if (!!host()) {
     config.host = host() as string;
+  } else {
+    config.host = DEFAULT_HOST;
   }
 
   client = new Client(config);
