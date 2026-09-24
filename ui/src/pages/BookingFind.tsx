@@ -12,8 +12,18 @@ import Button from '../components/forms/button';
 import { Trip } from '@wiremock-inc/apimatic-sdkgen-demo';
 
 const fetchStations = async () => {
-  const response = await stationsController.getStations();
-  return response.result.data;
+  // The SDK exposes no limit parameter (its spec predates the limit param), so the
+  // first call only returns the default page of 10 - not enough to book most routes.
+  // Walk the pages until one comes back empty to fill both station dropdowns.
+  const stations = [];
+  for (let page = 1; ; page++) {
+    const response = await stationsController.getStations(page);
+    const data = response.result.data ?? [];
+    if (data.length === 0) {
+      return stations;
+    }
+    stations.push(...data);
+  }
 };
 
 const fetchTrips = async (state: {
