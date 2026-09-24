@@ -10,6 +10,7 @@ import { bookingsController, paymentsController } from '../lib/client';
 import { A, useParams } from '@solidjs/router';
 import { CurrencyEnum } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { Card } from '@wiremock-inc/apimatic-sdkgen-demo';
+import { ObjectEnum } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { default as CardComponent } from '../components/card';
 import H1 from '../components/typeography/H1';
 import Spinner from '../components/spinner';
@@ -31,6 +32,24 @@ const Payment = () => {
   const bookingId = () => params.booking_id;
   const [booking] = createResource(bookingId, bookingFetcher);
 
+  /** Prefer the gateway's RFC 7807 problem detail over the SDK's generic message. */
+  const paymentErrorDetail = () => {
+    const error = paymentError() as
+      | (Error & { result?: { detail?: string }; body?: unknown })
+      | undefined;
+    if (error?.result?.detail) return error.result.detail;
+    const raw = error?.body;
+    try {
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (parsed && typeof parsed === 'object' && 'detail' in parsed) {
+        return String(parsed.detail);
+      }
+    } catch {
+      /* not JSON - fall through to the generic message */
+    }
+    return error?.message;
+  };
+
   const submit: JSX.EventHandler<HTMLFormElement, Event> = async (e) => {
     e.preventDefault();
     setIsPosting(true);
@@ -42,6 +61,8 @@ const Payment = () => {
           currency: CurrencyEnum.Gbp,
           amount: 1000,
           source: {
+            // the API's oneOf on source requires the object discriminator
+            object: ObjectEnum.Card,
             name: form.name,
             number: form.number,
             cvc: form.cvc,
@@ -101,7 +122,7 @@ const Payment = () => {
               <Show when={paymentError()}>
                 <div class="mb-6 text-wrap break-words rounded p-4 bg-red-700">
                   <h3 class="mb-4 text-2xl font-bold">Error!</h3>
-                  <p class="text-lg">{paymentError()?.message}</p>
+                  <p class="text-lg">{paymentErrorDetail()}</p>
                 </div>
               </Show>
 
