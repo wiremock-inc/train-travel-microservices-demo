@@ -43,7 +43,7 @@ never happens — see §6).
 | Spring Boot | 3.5.16 |
 | Build | Gradle 9.7.1, Kotlin DSL; Kotlin plugin 2.4.20 |
 | HTTP client (REST downstream) | `RestClient` (Spring 6.1+) — one bean per downstream, configured from properties, connect timeout 5s, read timeout 10s |
-| SOAP client | Spring WS `WebServiceTemplate`; JAXB classes generated from `payrail.wsdl` (see §7 codegen) |
+| SOAP client | Spring WS `WebServiceTemplate`; JAXB classes generated from `contracts/payrail.xsd` (see §7 codegen) |
 | Security | `spring-boot-starter-oauth2-resource-server` — local JWT validation |
 | JSON | Jackson with `PropertyNamingStrategies.SNAKE_CASE` module-wide (public API is snake_case; downstream clients opt out per-mapper — see §5) |
 | Validation | `spring-boot-starter-validation` + bean validation on request DTOs |
@@ -113,7 +113,7 @@ src/main/kotlin/com/wiremock/traintravel/
   payments/      PaymentsController.kt, PaymentSaga.kt, PayRailClient.kt, BookingPaymentDto.kt
   webhook/       WebhookNotifier.kt
   common/        Problem.kt, ApiExceptionHandler.kt, Uuids.kt, CollectionDto.kt
-src/main/resources/payrail.wsdl     (hand-authored — see v1-downstream-services.md §4)
+contracts/payrail.wsdl + payrail.xsd  (hand-authored — see v1-downstream-services.md §4)
 build/generated/wsdl/               (JAXB output — see §7)
 ```
 
@@ -179,7 +179,7 @@ processing is always correct; nothing needs streaming, batching, or shared ident
 
 | Step | Trigger | Command |
 |---|---|---|
-| Generate SOAP client | After any `payrail.xsd` edit | `./gradlew generateSoapClient` — a `JavaExec` task invoking `com.sun.xml.bind:jaxb-xjc` (`XJCFacade`) on `src/main/resources/payrail.xsd` (`-d build/generated/wsdl`, `-p com.wiremock.traintravel.payrail.generated`). `xjc` reads schemas, not WSDLs — that is why the schema lives in `payrail.xsd`, imported by `payrail.wsdl` via `xsd:import` (single source of truth). Output is **generated at build, never committed** |
+| Generate SOAP client | After any `contracts/payrail.xsd` edit | `./gradlew generateSoapClient` — a `JavaExec` task invoking `com.sun.xml.bind:jaxb-xjc` (`XJCFacade`) on `contracts/payrail.xsd` (`-d build/generated/wsdl`, `-p com.wiremock.traintravel.payrail.generated`). `xjc` reads schemas, not WSDLs — that is why the schema lives in `payrail.xsd`, imported by `payrail.wsdl` via `xsd:import` (single source of truth). Output is **generated at build, never committed** |
 | Kotlin build | Always | `./gradlew build` (JAXB generation is a dependency of `compileKotlin`) |
 | Mock estate | After stub/data changes | Created/updated via the WireMock Cloud MCP tools during the build phase (§8); OpenAPI descriptions for the three openapi-type mocks are pushed via the `push` tool (`type: openapi_description`) whenever their contracts change |
 

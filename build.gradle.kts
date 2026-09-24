@@ -47,14 +47,14 @@ dependencies {
     jaxb("com.sun.xml.bind:jaxb-xjc:4.0.5")
 }
 
-// --- SOAP client codegen: JAXB classes generated from payrail.wsdl ---
+// --- SOAP client codegen: JAXB classes generated from the PayRail contract ---
 
 val generatedWsdlDir = layout.buildDirectory.dir("generated/wsdl")
 
 val generateSoapClient = tasks.register("generateSoapClient", JavaExec::class) {
     group = "build"
-    description = "Generates JAXB classes from src/main/resources/payrail.xsd (the schema behind payrail.wsdl)"
-    val schema = layout.projectDirectory.file("src/main/resources/payrail.xsd")
+    description = "Generates JAXB classes from contracts/payrail.xsd (the schema behind contracts/payrail.wsdl)"
+    val schema = layout.projectDirectory.file("contracts/payrail.xsd")
     inputs.file(schema)
     outputs.dir(generatedWsdlDir)
     classpath = jaxb

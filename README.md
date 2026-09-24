@@ -13,8 +13,10 @@ SolidJS UI that consumes the API end-to-end, including real OAuth login against 
 | Mock Google IdP | OAuth2 | Google OAuth2 template (`5e5y3`) | Auth-code flow, JWKS, **JWT access tokens with `read`/`write` scopes** |
 | Webhook receiver | REST sink | `Train Travel Webhook Receiver` (`wm-train-travel-webhook`) | Open-URL stub, request journal as webhook evidence |
 
-Full design specs: [`docs/train-travel-microservices/`](docs/train-travel-microservices/). The mock estate
-definitions live in [`mock-estate/`](mock-estate/) (OpenAPI descriptions + stub mapping sets).
+Full design specs: [`docs/train-travel-microservices/`](docs/train-travel-microservices/). The API
+contracts for the invented downstream services live in [`contracts/`](contracts/) (OpenAPI
+descriptions + the PayRail WSDL) — enough to generate a mock estate from scratch — and the
+hand-authored stub mappings deployed in WireMock Cloud live in [`stubs/`](stubs/).
 
 ## Prerequisites
 
@@ -233,8 +235,8 @@ src/main/kotlin/com/wiremock/traintravel/
   bookings/    bookings   → Bookings Service (stateful mock, per-user X-User-Id state)
   payments/    payment saga → PayRail SOAP gateway (unstructured mock)
   webhook/     newBooking outbound webhook → Webhook Receiver mock
-src/main/resources/payrail.wsdl      contract-first WSDL; JAXB classes generated at build time
-mock-estate/                         OpenAPI descriptions + stub sets for the WireMock Cloud mocks
+contracts/                           downstream API contracts: OpenAPI descriptions + PayRail WSDL/XSD
+stubs/                               hand-authored WireMock stub sets for the deployed mocks
 ui/                                  SolidJS UI (Vite, :3000) - OAuth login, booking and payment flows
 e2e/                                 Puppeteer browser journey against the running stack
 docs/train-travel-microservices/     full specification documents

@@ -212,7 +212,7 @@ DELETE /reservations/{reservationId}
 **Mock API:** `Train Travel Payments Service (PayRail)` · hostname `wm-train-travel-payments` ·
 type **unstructured** (no OpenAPI — raw SOAP stubs).
 
-### Contract (the WSDL we hand-author, `payrail.wsdl`)
+### Contract (the WSDL we hand-author, [`contracts/payrail.wsdl`](../../contracts/payrail.wsdl))
 
 ```
 POST /payrail/v1
