@@ -13,14 +13,35 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
 
+    /**
+     * CORS for the bundled UI dev server (http://localhost:3000) - the browser calls
+     * this API cross-origin, and the Authorization header makes every call a preflight.
+     */
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource =
+        UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration(
+                "/**",
+                CorsConfiguration().apply {
+                    allowedOrigins = listOf("http://localhost:3000")
+                    allowedMethods = listOf("GET", "POST", "DELETE", "OPTIONS")
+                    allowedHeaders = listOf("*")
+                },
+            )
+        }
+
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf { it.disable() }
+            .cors { }
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers(HttpMethod.POST, "/bookings/**").hasAuthority("SCOPE_write")
                     .requestMatchers(HttpMethod.DELETE, "/bookings/**").hasAuthority("SCOPE_write")
