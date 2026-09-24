@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Kotlin/Native cruft
+.kotlin/
+
+# OS
+.DS_Store
+
+# Logs
+*.log

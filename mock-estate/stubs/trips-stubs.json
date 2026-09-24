@@ -1,0 +1,49 @@
+{
+  "mappings": [
+    {
+      "name": "Find connections",
+      "request": {
+        "urlPathTemplate": "/connections",
+        "method": "GET",
+        "customMatcher": {
+          "name": "custom-and-matcher",
+          "parameters": {
+            "matchers": [
+              {
+                "name": "data-exists",
+                "parameters": {
+                  "id": "n2v2w",
+                  "matcherEnabled": true,
+                  "query": "{{val request.query.pageSize.0 or=10 assign='limit'}}{{val request.query.page.0 or=1 assign='page'}}{{val (math (math page '-' 1) '*' limit) assign='offset'}}from_station_code='{{request.query.from}}' AND to_station_code='{{request.query.to}}' ORDER BY departure_time ASC LIMIT {{limit}} OFFSET {{offset}}"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": "{{#formatJson}}\n{{val request.query.page or=1 assign='page'}}{{val request.query.pageSize or=10 assign='limit'}}\n{\n  \"connections\": [\n    {{~#arrayJoin ',' data.items as |connection|~}}\n    {{#assign 'departure'}}{{request.query.date}}T{{connection.departure_time}}:00Z{{/assign}}\n    {{#assign 'durationOffset'}}{{connection.duration_minutes}} minutes{{/assign}}\n    {\n      \"connectionId\": \"{{connection.connection_id}}\",\n      \"from\": { \"stationCode\": \"{{connection.from_station_code}}\", \"scheduledDeparture\": \"{{departure}}\" },\n      \"to\": { \"stationCode\": \"{{connection.to_station_code}}\", \"scheduledArrival\": \"{{date (parseDate departure) offset=durationOffset}}\" },\n      \"operator\": { \"code\": \"{{connection.operator_code}}\", \"name\": \"{{connection.operator_name}}\" },\n      \"fare\": { \"amount\": {{connection.fare_amount}}, \"currency\": \"{{connection.fare_currency}}\" },\n      \"facilities\": { \"bicyclesAllowed\": {{connection.bicycles_allowed}}, \"dogsAllowed\": {{connection.dogs_allowed}} }\n    }{{/arrayJoin}}\n  ],\n  \"page\": {{page}},\n  \"pageSize\": {{limit}}\n}\n{{/formatJson}}",
+        "headers": { "Content-Type": "application/json" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 5
+    },
+    {
+      "name": "Find connections (no connections on route)",
+      "request": {
+        "urlPathTemplate": "/connections",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "body": "{{#formatJson}}\n{{val request.query.page or=1 assign='page'}}{{val request.query.pageSize or=10 assign='limit'}}\n{\n  \"connections\": [],\n  \"page\": {{page}},\n  \"pageSize\": {{limit}}\n}\n{{/formatJson}}",
+        "headers": { "Content-Type": "application/json" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 10
+    }
+  ]
+}

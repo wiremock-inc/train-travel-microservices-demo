@@ -1,0 +1,83 @@
+{
+  "mappings": [
+    {
+      "name": "ProcessPayment - approve test card 4242",
+      "request": {
+        "urlPath": "/payrail/v1",
+        "method": "POST",
+        "bodyPatterns": [{ "contains": "4242424242424242" }]
+      },
+      "response": {
+        "status": 200,
+        "body": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pay=\"http://payrail.example.com/v1\">\n  <soapenv:Body>\n    <pay:processPaymentResponse>\n      <pay:transactionId>{{randomValue type='UUID'}}</pay:transactionId>\n      <pay:responseCode>APPROVED</pay:responseCode>\n      <pay:authorisedAmount>{{regexExtract request.body '[0-9]+\\.[0-9]{2}'}}</pay:authorisedAmount>\n      <pay:maskedCardNumber>************4242</pay:maskedCardNumber>\n      <pay:processedAt>{{now}}</pay:processedAt>\n    </pay:processPaymentResponse>\n  </soapenv:Body>\n</soapenv:Envelope>",
+        "headers": { "Content-Type": "text/xml" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 2
+    },
+    {
+      "name": "ProcessPayment - decline test card 4000",
+      "request": {
+        "urlPath": "/payrail/v1",
+        "method": "POST",
+        "bodyPatterns": [{ "contains": "4000000000000002" }]
+      },
+      "response": {
+        "status": 200,
+        "body": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pay=\"http://payrail.example.com/v1\">\n  <soapenv:Body>\n    <pay:processPaymentResponse>\n      <pay:transactionId>{{randomValue type='UUID'}}</pay:transactionId>\n      <pay:responseCode>DECLINED</pay:responseCode>\n      <pay:declineReason>card_declined</pay:declineReason>\n      <pay:processedAt>{{now}}</pay:processedAt>\n    </pay:processPaymentResponse>\n  </soapenv:Body>\n</soapenv:Envelope>",
+        "headers": { "Content-Type": "text/xml" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 2
+    },
+    {
+      "name": "ProcessPayment - approve bank account",
+      "request": {
+        "urlPath": "/payrail/v1",
+        "method": "POST",
+        "bodyPatterns": [{ "contains": "sortCode" }]
+      },
+      "response": {
+        "status": 200,
+        "body": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pay=\"http://payrail.example.com/v1\">\n  <soapenv:Body>\n    <pay:processPaymentResponse>\n      <pay:transactionId>{{randomValue type='UUID'}}</pay:transactionId>\n      <pay:responseCode>APPROVED</pay:responseCode>\n      <pay:authorisedAmount>{{regexExtract request.body '[0-9]+\\.[0-9]{2}'}}</pay:authorisedAmount>\n      <pay:maskedAccountNumber>*********{{regexExtract request.body '[0-9]{4}(?=</[0-9A-Za-z:]*accountNumber>)'}}</pay:maskedAccountNumber>\n      <pay:processedAt>{{now}}</pay:processedAt>\n    </pay:processPaymentResponse>\n  </soapenv:Body>\n</soapenv:Envelope>",
+        "headers": { "Content-Type": "text/xml" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 3
+    },
+    {
+      "name": "ProcessPayment - approve any other card",
+      "request": {
+        "urlPath": "/payrail/v1",
+        "method": "POST",
+        "bodyPatterns": [{ "contains": "cardNumber" }]
+      },
+      "response": {
+        "status": 200,
+        "body": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pay=\"http://payrail.example.com/v1\">\n  <soapenv:Body>\n    <pay:processPaymentResponse>\n      <pay:transactionId>{{randomValue type='UUID'}}</pay:transactionId>\n      <pay:responseCode>APPROVED</pay:responseCode>\n      <pay:authorisedAmount>{{regexExtract request.body '[0-9]+\\.[0-9]{2}'}}</pay:authorisedAmount>\n      <pay:maskedCardNumber>************{{regexExtract request.body '[0-9]{4}(?=</[0-9A-Za-z:]*cardNumber>)'}}</pay:maskedCardNumber>\n      <pay:processedAt>{{now}}</pay:processedAt>\n    </pay:processPaymentResponse>\n  </soapenv:Body>\n</soapenv:Envelope>",
+        "headers": { "Content-Type": "text/xml" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 4
+    },
+    {
+      "name": "ProcessPayment - validation fault (currency XXX)",
+      "request": {
+        "urlPath": "/payrail/v1",
+        "method": "POST",
+        "bodyPatterns": [{ "contains": ">XXX<" }]
+      },
+      "response": {
+        "status": 500,
+        "body": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <soapenv:Body>\n    <soapenv:Fault>\n      <faultcode>soapenv:Client</faultcode>\n      <faultstring>VALIDATION: unsupported currency code</faultstring>\n      <detail>\n        <pay:PayRailFault xmlns:pay=\"http://payrail.example.com/v1\">\n          <pay:faultCode>VALIDATION</pay:faultCode>\n          <pay:faultText>Currency XXX is not supported</pay:faultText>\n        </pay:PayRailFault>\n      </detail>\n    </soapenv:Fault>\n  </soapenv:Body>\n</soapenv:Envelope>",
+        "headers": { "Content-Type": "text/xml" }
+      },
+      "persistent": true,
+      "priority": 5
+    }
+  ]
+}

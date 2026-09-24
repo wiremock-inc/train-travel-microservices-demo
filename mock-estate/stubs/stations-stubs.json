@@ -1,0 +1,49 @@
+{
+  "mappings": [
+    {
+      "name": "Get station data",
+      "request": {
+        "urlPathTemplate": "/station-data",
+        "method": "GET",
+        "customMatcher": {
+          "name": "custom-and-matcher",
+          "parameters": {
+            "matchers": [
+              {
+                "name": "data-exists",
+                "parameters": {
+                  "id": "xvg9k",
+                  "matcherEnabled": true,
+                  "query": "{{val request.query.pageSize.0 or=10 assign='pageSize'}}{{val request.query.offset.0 or=0 assign='offset'}}{{#if request.query.country}}country_iso_code='{{request.query.country}}' AND {{/if}}station_code != '' ORDER BY station_name ASC LIMIT {{pageSize}} OFFSET {{offset}}"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": "{{#formatJson}}\n{{val request.query.pageSize.0 or=10 assign='pageSize'}}{{val request.query.offset.0 or=0 assign='offset'}}\n{\n  \"stations\": [\n    {{~#arrayJoin ',' data.items as |station|~}}\n    {\n      \"stationCode\": \"{{station.station_code}}\",\n      \"stationName\": \"{{station.station_name}}\",\n      \"addressLines\": [\"{{station.address_line_1}}\"{{#if station.address_line_2}}, \"{{station.address_line_2}}\"{{/if}}{{#if station.address_line_3}}, \"{{station.address_line_3}}\"{{/if}}],\n      \"countryIsoCode\": \"{{station.country_iso_code}}\",\n      \"geo\": { \"latitude\": {{station.latitude}}, \"longitude\": {{station.longitude}} },\n      \"tzId\": \"{{station.tz_id}}\"\n    }{{/arrayJoin}}\n  ],\n  \"offset\": {{offset}},\n  \"pageSize\": {{pageSize}}\n}\n{{/formatJson}}",
+        "headers": { "Content-Type": "application/json" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 5
+    },
+    {
+      "name": "Get station data (no matches)",
+      "request": {
+        "urlPathTemplate": "/station-data",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "body": "{{#formatJson}}\n{{val request.query.pageSize.0 or=10 assign='pageSize'}}{{val request.query.offset.0 or=0 assign='offset'}}\n{\n  \"stations\": [],\n  \"offset\": {{offset}},\n  \"pageSize\": {{pageSize}}\n}\n{{/formatJson}}",
+        "headers": { "Content-Type": "application/json" },
+        "transformers": ["response-template"]
+      },
+      "persistent": true,
+      "priority": 10
+    }
+  ]
+}

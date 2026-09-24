@@ -1,0 +1,306 @@
+{
+  "info": {
+    "name": "Train Travel API (gateway demo)",
+    "description": "Walks the full Train Travel journey against the Spring Boot gateway, backed entirely by WireMock Cloud mocks. Steps 1-2 script the OAuth authorization-code flow against the mock Google IdP and capture the JWT access token automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('travel_date')) {",
+          "  pm.environment.set('travel_date', new Date().toISOString().slice(0, 10));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "access_token", "value": "" },
+    { "key": "station_id_berlin", "value": "" },
+    { "key": "station_id_munich", "value": "" },
+    { "key": "trip_id", "value": "" },
+    { "key": "booking_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Login (mock Google - returns auth code)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const location = pm.response.headers.get('Location') || '';",
+              "const code = location.match(/code=([^&]+)/);",
+              "pm.collectionVariables.set('auth_code', code ? decodeURIComponent(code[1]) : '');",
+              "pm.test('login redirected with a code', () => pm.expect(code).to.not.be.null);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "clientId", "value": "train-travel-demo", "type": "text" },
+            { "key": "email", "value": "demo@example.com", "type": "text" },
+            { "key": "scopes", "value": "openid email read write", "type": "text" },
+            { "key": "state", "value": "demo-state", "type": "text" },
+            { "key": "redirectUri", "value": "http://localhost:9090/callback", "type": "text" }
+          ]
+        },
+        "url": {
+          "raw": "{{auth_base}}/login",
+          "host": ["{{auth_base}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "2. Exchange code for JWT access token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('access_token', json.access_token);",
+              "pm.test('issued a JWT access token', () => pm.expect(json.access_token.split('.')).to.have.lengthOf(3));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "grant_type", "value": "authorization_code", "type": "text" },
+            { "key": "code", "value": "{{auth_code}}", "type": "text" }
+          ]
+        },
+        "url": {
+          "raw": "{{auth_base}}/token",
+          "host": ["{{auth_base}}"],
+          "path": ["token"]
+        }
+      }
+    },
+    {
+      "name": "3. Get stations (search Berlin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('station_id_berlin', json.data[0].id);",
+              "pm.test('found a station', () => pm.expect(json.data).to.not.be.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/stations?search=Berlin",
+          "host": ["{{base_url}}"],
+          "path": ["stations"],
+          "query": [{ "key": "search", "value": "Berlin" }]
+        }
+      }
+    },
+    {
+      "name": "4. Get stations (search München)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('station_id_munich', json.data[0].id);",
+              "pm.test('found a station', () => pm.expect(json.data).to.not.be.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/stations?search=München",
+          "host": ["{{base_url}}"],
+          "path": ["stations"],
+          "query": [{ "key": "search", "value": "München" }]
+        }
+      }
+    },
+    {
+      "name": "5. Get trips (Berlin → München, today)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('trip_id', json.data[0].id);",
+              "pm.test('found trips', () => pm.expect(json.data).to.not.be.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/trips?origin={{station_id_berlin}}&destination={{station_id_munich}}&date={{travel_date}}",
+          "host": ["{{base_url}}"],
+          "path": ["trips"],
+          "query": [
+            { "key": "origin", "value": "{{station_id_berlin}}" },
+            { "key": "destination", "value": "{{station_id_munich}}" },
+            { "key": "date", "value": "{{travel_date}}" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Create booking (fires newBooking webhook)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('booking_id', json.id);",
+              "pm.test('booking created', () => pm.expect(json.id).to.not.be.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"trip_id\": \"{{trip_id}}\",\n  \"passenger_name\": \"Jane Smith\",\n  \"has_bicycle\": true,\n  \"has_dog\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bookings",
+          "host": ["{{base_url}}"],
+          "path": ["bookings"]
+        }
+      }
+    },
+    {
+      "name": "7. Pay booking (approved card 4242)",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 89.90,\n  \"currency\": \"eur\",\n  \"source\": {\n    \"object\": \"card\",\n    \"name\": \"J. Doe\",\n    \"number\": \"4242424242424242\",\n    \"cvc\": \"123\",\n    \"exp_month\": 12,\n    \"exp_year\": 2027,\n    \"address_country\": \"gb\",\n    \"address_post_code\": \"N12 9XX\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bookings/{{booking_id}}/payment",
+          "host": ["{{base_url}}"],
+          "path": ["bookings", "{{booking_id}}", "payment"]
+        }
+      }
+    },
+    {
+      "name": "8. Double payment (400 - already paid)",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 89.90,\n  \"currency\": \"eur\",\n  \"source\": {\n    \"object\": \"card\",\n    \"name\": \"J. Doe\",\n    \"number\": \"4242424242424242\",\n    \"cvc\": \"123\",\n    \"exp_month\": 12,\n    \"exp_year\": 2027,\n    \"address_country\": \"gb\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bookings/{{booking_id}}/payment",
+          "host": ["{{base_url}}"],
+          "path": ["bookings", "{{booking_id}}", "payment"]
+        }
+      }
+    },
+    {
+      "name": "9. Declined card (400 - booking stays HELD)",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 89.90,\n  \"currency\": \"eur\",\n  \"source\": {\n    \"object\": \"card\",\n    \"name\": \"J. Doe\",\n    \"number\": \"4000000000000002\",\n    \"cvc\": \"123\",\n    \"exp_month\": 12,\n    \"exp_year\": 2027,\n    \"address_country\": \"gb\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/bookings/{{booking_id}}/payment",
+          "host": ["{{base_url}}"],
+          "path": ["bookings", "{{booking_id}}", "payment"]
+        }
+      }
+    },
+    {
+      "name": "10. List my bookings",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/bookings",
+          "host": ["{{base_url}}"],
+          "path": ["bookings"]
+        }
+      }
+    },
+    {
+      "name": "11. Past-date trips (400)",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/trips?origin={{station_id_berlin}}&destination={{station_id_munich}}&date=2020-01-01",
+          "host": ["{{base_url}}"],
+          "path": ["trips"],
+          "query": [
+            { "key": "origin", "value": "{{station_id_berlin}}" },
+            { "key": "destination", "value": "{{station_id_munich}}" },
+            { "key": "date", "value": "2020-01-01" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "12. No token (401)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/stations",
+          "host": ["{{base_url}}"],
+          "path": ["stations"]
+        }
+      }
+    }
+  ]
+}

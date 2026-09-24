@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    {
+      "name": "Receive webhook (any POST URL)",
+      "request": {
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "body": "{\n  \"received\": true\n}",
+        "headers": { "Content-Type": "application/json" }
+      },
+      "persistent": true,
+      "priority": 5
+    }
+  ]
+}

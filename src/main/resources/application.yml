@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: train-travel-gateway
+  jackson:
+    # The public Train Travel API is snake_case; downstream models override per-class
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Mocked Google IdP (WireMock Cloud, Google OAuth2 template). OIDC discovery gives us
+          # the JWKS endpoint and issuer validation. Note: tokens must be issued via this exact
+          # base URL, because the IdP mints `iss` from the request's own base URL.
+          issuer-uri: https://5e5y3.wiremockapi.cloud
+
+traintravel:
+  public-base-url: http://localhost:8080
+  stations:
+    base-url: https://wm-train-travel-stations.wiremockapi.cloud
+  trips:
+    base-url: https://wm-train-travel-trips.wiremockapi.cloud
+  bookings:
+    base-url: https://wm-train-travel-bookings.wiremockapi.cloud
+  payments:
+    base-url: https://wm-train-travel-payments.wiremockapi.cloud/payrail/v1
+  webhook:
+    url: https://wm-train-travel-webhook.wiremockapi.cloud/new-booking
+    timeout: 3s
+  downstream:
+    connect-timeout: 5s
+    read-timeout: 10s
