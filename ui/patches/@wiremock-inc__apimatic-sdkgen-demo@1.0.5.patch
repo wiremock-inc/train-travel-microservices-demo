@@ -12,6 +12,19 @@ index 2deec9bad92b8c7da299e96d11bcdc816fbefe91..fdda2817820bdedc7e9a5e5a5418e2f2
              return (0, core_2.pathTemplate)(templateObject_1 || (templateObject_1 = tslib_1.__makeTemplateObject(["https://", ""], ["https://", ""])), new core_2.SkipEncode(config.host));
          }
          if (server === 'auth server') {
+diff --git a/dist/cjs/models/card.js b/dist/cjs/models/card.js
+index 8b39f4f9adbd5a11cc7caaa1890e0a496bf53a07..3247032bed20769d1f5e4aee74668f48470791bd 100644
+--- a/dist/cjs/models/card.js
++++ b/dist/cjs/models/card.js
+@@ -12,7 +12,7 @@ exports.cardSchema = (0, schema_1.object)({
+     object: ['object', (0, schema_1.optional)(objectEnum_1.objectEnumSchema)],
+     name: ['name', (0, schema_1.string)()],
+     number: ['number', (0, schema_1.string)()],
+-    cvc: ['cvc', (0, schema_1.number)()],
++    cvc: ['cvc', (0, schema_1.optional)((0, schema_1.number)())],
+     expMonth: ['exp_month', (0, schema_1.bigint)()],
+     expYear: ['exp_year', (0, schema_1.bigint)()],
+     addressLine1: ['address_line1', (0, schema_1.optional)((0, schema_1.string)())],
 diff --git a/dist/esm/client.js b/dist/esm/client.js
 index 0ede4b93d0b8ad0fc589b28014a3d8df3b413e2e..f381ed3e5332a1dfa3f955ec3f5277c5be85d85e 100644
 --- a/dist/esm/client.js
@@ -26,3 +39,29 @@ index 0ede4b93d0b8ad0fc589b28014a3d8df3b413e2e..f381ed3e5332a1dfa3f955ec3f5277c5
              return pathTemplate `https://${new SkipEncode(config.host)}`;
          }
          if (server === 'auth server') {
+diff --git a/dist/esm/models/card.js b/dist/esm/models/card.js
+index 482930a07807328f01785583fb26735952382e0c..f1480bbf9f634bc41d504b732952006994869b1c 100644
+--- a/dist/esm/models/card.js
++++ b/dist/esm/models/card.js
+@@ -9,7 +9,7 @@ export const cardSchema = object({
+     object: ['object', optional(objectEnumSchema)],
+     name: ['name', string()],
+     number: ['number', string()],
+-    cvc: ['cvc', number()],
++    cvc: ['cvc', optional(number())],
+     expMonth: ['exp_month', bigint()],
+     expYear: ['exp_year', bigint()],
+     addressLine1: ['address_line1', optional(string())],
+diff --git a/dist/types/models/card.d.ts b/dist/types/models/card.d.ts
+index f88a4efc46b25cb0448a3e05d3c3b75d35d05405..14bd1cf937d89547e95c3d05f2e8bf87967fac10 100644
+--- a/dist/types/models/card.d.ts
++++ b/dist/types/models/card.d.ts
+@@ -13,7 +13,7 @@ export interface Card {
+     /** The card number, as a string without any separators. On read all but the last four digits will be masked for security. */
+     number: string;
+     /** Card security code, 3 or 4 digits usually found on the back of the card. */
+-    cvc: number;
++    cvc?: number;
+     /** Two-digit number representing the card's expiration month. */
+     expMonth: bigint;
+     /** Four-digit number representing the card's expiration year. */
