@@ -9,6 +9,7 @@ import BookingPage from './pages/Booking';
 import Payment from './pages/Payment';
 import BookingFindPage from "./pages/BookingFind";
 import MyBookingsPage from "./pages/MyBookings";
+import CallbackPage from "./pages/Callback";
 
 const root = document.getElementById('root');
 
@@ -20,6 +21,7 @@ render(
             <Route path="/booking/new" component={BookingFindPage}/>
             <Route path="/booking/:trip_id" component={BookingPage}/>
             <Route path="/payment/:booking_id" component={Payment}/>
+            <Route path="/callback" component={CallbackPage}/>
         </Router>
     ),
     root!,

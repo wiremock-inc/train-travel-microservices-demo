@@ -3,7 +3,8 @@ import { createSignal, JSX, ParentComponent, Show } from 'solid-js';
 import styles from './App.module.css';
 import { A } from '@solidjs/router';
 import Input from './components/forms/input';
-import { setHost, host } from './lib/client';
+import { accessToken, logout, setHost, host } from './lib/client';
+import { login } from './lib/auth';
 import Button from './components/forms/button';
 
 const PROTOCOL_REGEXP = /https:\/\//g;
@@ -83,6 +84,12 @@ const App: ParentComponent = (props) => {
             </Show>
             <Show when={host()}>
               <Button onClick={() => resetHost()}>Reset</Button>
+            </Show>
+            <Show when={!accessToken()}>
+              <Button onClick={() => login()}>Log in</Button>
+            </Show>
+            <Show when={accessToken()}>
+              <Button onClick={() => logout()}>Log out</Button>
             </Show>
           </div>
         </div>
