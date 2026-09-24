@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@wiremock-inc/apimatic-sdkgen-demo@1.0.5':
+    hash: fffkwbprkoxlebh5dw3yjdb7ei
+    path: patches/@wiremock-inc__apimatic-sdkgen-demo@1.0.5.patch
+
 importers:
 
   .:
@@ -13,7 +18,7 @@ importers:
         version: 0.13.6(solid-js@1.8.11)
       '@wiremock-inc/apimatic-sdkgen-demo':
         specifier: ^1.0.5
-        version: 1.0.5
+        version: 1.0.5(patch_hash=fffkwbprkoxlebh5dw3yjdb7ei)
       pnpm:
         specifier: ^9.4.0
         version: 9.4.0
@@ -1935,7 +1940,7 @@ snapshots:
 
   '@types/estree@1.0.5': {}
 
-  '@wiremock-inc/apimatic-sdkgen-demo@1.0.5':
+  '@wiremock-inc/apimatic-sdkgen-demo@1.0.5(patch_hash=fffkwbprkoxlebh5dw3yjdb7ei)':
     dependencies:
       '@apimatic/authentication-adapters': 0.5.4
       '@apimatic/axios-client-adapter': 0.3.5

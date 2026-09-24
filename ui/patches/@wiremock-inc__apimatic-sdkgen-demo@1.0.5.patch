@@ -1,0 +1,28 @@
+diff --git a/dist/cjs/client.js b/dist/cjs/client.js
+index 2deec9bad92b8c7da299e96d11bcdc816fbefe91..fdda2817820bdedc7e9a5e5a5418e2f21f511e9c 100644
+--- a/dist/cjs/client.js
++++ b/dist/cjs/client.js
+@@ -69,6 +69,9 @@ function getBaseUri(server, config) {
+     if (server === void 0) { server = 'default'; }
+     if (config.environment === configuration_1.Environment.Production) {
+         if (server === 'default') {
++            if (/^https?:\/\//.test(config.host)) {
++                return config.host;
++            }
+             return (0, core_2.pathTemplate)(templateObject_1 || (templateObject_1 = tslib_1.__makeTemplateObject(["https://", ""], ["https://", ""])), new core_2.SkipEncode(config.host));
+         }
+         if (server === 'auth server') {
+diff --git a/dist/esm/client.js b/dist/esm/client.js
+index 0ede4b93d0b8ad0fc589b28014a3d8df3b413e2e..f381ed3e5332a1dfa3f955ec3f5277c5be85d85e 100644
+--- a/dist/esm/client.js
++++ b/dist/esm/client.js
+@@ -55,6 +55,9 @@ function createHttpClientAdapter(client) {
+ function getBaseUri(server = 'default', config) {
+     if (config.environment === Environment.Production) {
+         if (server === 'default') {
++            if (/^https?:\/\//.test(config.host)) {
++                return config.host;
++            }
+             return pathTemplate `https://${new SkipEncode(config.host)}`;
+         }
+         if (server === 'auth server') {
