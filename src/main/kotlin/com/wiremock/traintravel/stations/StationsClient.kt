@@ -5,7 +5,7 @@ import com.wiremock.traintravel.config.RestClientFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
-/** Client for the Stations Service (mocked in WireMock Cloud, CSV data-driven). */
+/** Client for the Stations Service (European Rail Reference Data). */
 @Component
 class StationsClient(props: AppProperties, factory: RestClientFactory) {
 

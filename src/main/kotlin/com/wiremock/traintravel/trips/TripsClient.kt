@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.time.LocalDate
 
-/** Client for the Trips Service (mocked in WireMock Cloud, CSV data-driven with date-stamped templating). */
+/** Client for the Trips Service (European Rail Timetable). */
 @Component
 class TripsClient(props: AppProperties, factory: RestClientFactory) {
 

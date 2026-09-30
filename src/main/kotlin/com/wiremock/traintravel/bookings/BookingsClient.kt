@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 /**
- * Client for the Bookings Service (mocked in WireMock Cloud, stateful).
- * Every call carries X-User-Id; the mock scopes its KV state context to that header,
+ * Client for the Bookings Service (Rail Reservations).
+ * Every call carries X-User-Id; the service scopes reservations to that header,
  * so one user's reservations are invisible to another.
  */
 @Component

@@ -25,8 +25,8 @@ data class PayRailApproval(
 )
 
 /**
- * SOAP client for the PayRail payment gateway (mocked in WireMock Cloud as an
- * unstructured mock API). JAXB classes are generated from payrail.wsdl at build time.
+ * SOAP client for the PayRail payment gateway. JAXB classes are generated from
+ * payrail.wsdl at build time.
  */
 @Component
 class PayRailClient(private val template: WebServiceTemplate) {

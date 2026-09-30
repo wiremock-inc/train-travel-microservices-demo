@@ -30,7 +30,7 @@ class PaymentSaga(
             throw BadRequestException("Booking has already been paid.")
         }
 
-        // Two decimal places: the PayRail stub echoes the amount back from the envelope
+        // Two decimal places: PayRail echoes the amount back from the envelope
         val amount = request.amount.setScale(2)
         val approval = payRailClient.processPayment(bookingId, amount, currency.uppercase(), request.source)
 
