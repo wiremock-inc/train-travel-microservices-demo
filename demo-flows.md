@@ -6,6 +6,17 @@
 * Update the config file to point to these
 * Run the tests, adjust the mocks, repeat until passed
 
+### Prompt
+this service has a set of APIs it depends on that are currently only available as flakey sandboxes. mock each of the APIs in WireMock Cloud and configure the app to use them so
+that we're not dependent on the sandboxes any more. ensure that all of the Postman tests pass when running against these mocks.
+
+
+### Payment failure scenarios
+1. Create a test for when the payment gateway returns FRAUD_SUSPECTED.
+2. Create a test confirming that the system behaves safely when PayRail times out (>10s).  
+3. Create a test for when Bookings rejects the create request. The gateway passes any UUID through as tripRef without checking the trip exists. A real reservation system would likely return 400/422 for
+   an unknown trip, or 409 when the train is sold out. Both would become a generic 500 through downstreamStatus, where a clear 4xx would be better.
+
 ## Detect a change in a dependency and fix
 * Update a contract
 * Run the tests with hard validation enabled
