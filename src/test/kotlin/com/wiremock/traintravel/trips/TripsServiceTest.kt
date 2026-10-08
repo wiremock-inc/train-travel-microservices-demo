@@ -31,6 +31,7 @@ class TripsServiceTest {
         trips = AppProperties.Downstream("https://trips.example"),
         bookings = AppProperties.Downstream("https://bookings.example"),
         payments = AppProperties.Downstream("https://payments.example"),
+        stripe = AppProperties.Stripe("https://stripe.example", "sk_test_123", "http://localhost:3000"),
         webhook = AppProperties.Webhook("https://webhook.example/new-booking", Duration.ofSeconds(3)),
         downstream = AppProperties.Timeouts(Duration.ofSeconds(5), Duration.ofSeconds(10)),
     )

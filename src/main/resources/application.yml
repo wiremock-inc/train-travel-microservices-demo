@@ -27,6 +27,12 @@ traintravel:
     base-url: https://wm-train-travel-bookings.wiremockapi.cloud
   payments:
     base-url: https://wm-train-travel-payments.wiremockapi.cloud/payrail/v1
+  stripe:
+    # Stripe API + hosted Checkout page (WireMock Cloud local environment `train-travel`)
+    base-url: http://v1q0j.local.wiremock.cloud
+    secret-key: sk_test_train_travel_demo
+    # Where the hosted Checkout page sends the browser back to: the UI
+    return-base-url: http://localhost:3000
   webhook:
     url: https://wm-train-travel-webhook.wiremockapi.cloud/new-booking
     timeout: 3s

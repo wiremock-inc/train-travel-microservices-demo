@@ -1,11 +1,12 @@
 /**
  * Drives a real Chrome through the whole UI journey:
  *
- *   log in (mock Google IdP) -> find trips -> book -> pay (approve + decline)
- *   -> view my bookings -> delete booking -> log out
+ *   log in (mock Google IdP) -> find trips -> book -> pay by card (decline + approve)
+ *   -> book again -> pay on Stripe's hosted Checkout page (cancel + pay)
+ *   -> view my bookings -> delete bookings -> log out
  *
  * Everything behind the UI is the Spring Boot gateway (localhost:8080), which in
- * turn talks only to WireMock Cloud mocks. Requires:
+ * turn talks only to WireMock Cloud mocks (Stripe's API and hosted page included). Requires:
  *   - the UI dev server on localhost:3000
  *   - the gateway on localhost:8080
  *
@@ -22,6 +23,7 @@ const UI = 'http://localhost:3000';
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const PROFILE_DIR = path.join(os.tmpdir(), `train-travel-e2e-${process.pid}`);
 const PASSENGER = `Puppetester ${new Date().toISOString().slice(11, 19)}`;
+const STRIPE_PASSENGER = `${PASSENGER} (Stripe)`;
 
 fs.rmSync(PROFILE_DIR, { recursive: true, force: true });
 
@@ -39,7 +41,8 @@ page.setDefaultTimeout(20000);
 
 const httpProblems = [];
 page.on('response', (r) => {
-  if (r.status() >= 400) {
+  // the Stripe hosted page has no favicon; the browser's speculative request for one is noise
+  if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) {
     httpProblems.push(`${r.status()} ${r.request().method()} ${r.url()}`);
   }
 });
@@ -110,60 +113,82 @@ await waitFor(
 );
 console.log('logged in, landed on my-bookings');
 
-step('find a trip (Berlin -> München, tomorrow)');
-await page.goto(`${UI}/booking/new`, { waitUntil: 'domcontentloaded' });
-await waitFor(
-  () => document.querySelectorAll('#from option').length > 2,
-  15000,
-  'stations to load (authenticated /stations call)',
-);
-const pickStation = async (id, label) => {
-  const value = await page.$eval(
-    id,
-    (el, label) =>
-      [...el.options].find((o) => o.textContent.trim().includes(label))?.value,
-    label,
+/** Finds Berlin -> München trips for tomorrow, books the first one and lands on its payment page. */
+async function bookTrip(passenger) {
+  await page.goto(`${UI}/booking/new`, { waitUntil: 'domcontentloaded' });
+  await waitFor(
+    () => document.querySelectorAll('#from option').length > 2,
+    15000,
+    'stations to load (authenticated /stations call)',
   );
-  if (!value) {
-    const options = await page.$eval(id, (el) =>
-      [...el.options].map((o) => o.textContent.trim()),
+  const pickStation = async (id, label) => {
+    const value = await page.$eval(
+      id,
+      (el, label) =>
+        [...el.options].find((o) => o.textContent.trim().includes(label))?.value,
+      label,
     );
-    fail(`station "${label}" not in ${id}; options were: ${JSON.stringify(options)}`);
-  }
-  return value;
-};
-await page.select('#from', await pickStation('#from', 'Berlin Hauptbahnhof'));
-await page.select('#to', await pickStation('#to', 'München Hauptbahnhof'));
-await page.$eval(
-  '#date',
-  (el, v) => {
-    el.value = v;
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  },
-  tomorrow,
-);
-await page.waitForSelector('table tbody tr', { timeout: 15000 });
-const tripCount = await page.$$eval('table tbody tr', (rows) => rows.length);
-console.log(`trips found: ${tripCount}`);
+    if (!value) {
+      const options = await page.$eval(id, (el) =>
+        [...el.options].map((o) => o.textContent.trim()),
+      );
+      fail(`station "${label}" not in ${id}; options were: ${JSON.stringify(options)}`);
+    }
+    return value;
+  };
+  await page.select('#from', await pickStation('#from', 'Berlin Hauptbahnhof'));
+  await page.select('#to', await pickStation('#to', 'München Hauptbahnhof'));
+  await page.$eval(
+    '#date',
+    (el, v) => {
+      el.value = v;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    tomorrow,
+  );
+  await page.waitForSelector('table tbody tr', { timeout: 15000 });
+  const tripCount = await page.$$eval('table tbody tr', (rows) => rows.length);
+  console.log(`trips found: ${tripCount}`);
 
-step('book the first trip');
-await page.click('table tbody tr:first-child button');
-await waitFor(
-  () => /^\/booking\/(?!new).+/.test(location.pathname),
-  10000,
-  'passenger details page',
-);
-await page.waitForSelector('#name');
-await page.type('#name', PASSENGER);
-// the form binds onChange, which never fires from typing alone - dispatch it
-await page.$eval('#name', (el) => el.dispatchEvent(new Event('change', { bubbles: true })));
-await clickButton('Book');
-await waitFor(
-  () => /^\/payment\/.+/.test(location.pathname),
-  15000,
-  'payment page after booking',
-);
-console.log(`booking created, payment page for ${page.url()}`);
+  await page.click('table tbody tr:first-child button');
+  await waitFor(
+    () => /^\/booking\/(?!new).+/.test(location.pathname),
+    10000,
+    'passenger details page',
+  );
+  await page.waitForSelector('#name');
+  await page.type('#name', passenger);
+  // the form binds onChange, which never fires from typing alone - dispatch it
+  await page.$eval('#name', (el) => el.dispatchEvent(new Event('change', { bubbles: true })));
+  await clickButton('Book');
+  await waitFor(
+    () => /^\/payment\/.+/.test(location.pathname),
+    15000,
+    'payment page after booking',
+  );
+  console.log(`booking created, payment page for ${page.url()}`);
+}
+
+/** Clicks an outcome button on the Stripe hosted Checkout page and waits to be sent back to the UI. */
+async function chooseOnStripeCheckout(outcome) {
+  await waitFor(
+    () => location.pathname.startsWith('/hosted/checkout/'),
+    15000,
+    'Stripe hosted Checkout page',
+  );
+  const button = `[data-mock-outcome=${outcome}]`;
+  await page.waitForSelector(button);
+  await page.click(button);
+  await waitFor(
+    (ui) => location.href.startsWith(`${ui}/payment/`),
+    15000,
+    `Stripe to redirect back to the payment page after "${outcome}"`,
+    UI,
+  );
+}
+
+step('find a trip (Berlin -> München, tomorrow) and book it');
+await bookTrip(PASSENGER);
 
 step('pay with the declined card (expect the error panel)');
 await page.waitForSelector('#cardNumber');
@@ -204,30 +229,64 @@ const paymentRef = await page.evaluate(() => {
 });
 console.log(`payment succeeded, reference: ${paymentRef}`);
 
-step('view my bookings and confirm the booking is there');
+step('book a second trip to pay for with Stripe');
+await bookTrip(STRIPE_PASSENGER);
+
+step('start Stripe Checkout, then cancel on the hosted page');
+await clickButton('Pay with Stripe');
+await chooseOnStripeCheckout('cancel');
+await waitFor(
+  () => document.body.textContent.includes('Stripe payment was cancelled'),
+  15000,
+  'cancelled Stripe payment notice',
+);
+console.log('cancel surfaced in the UI, booking still HELD');
+
+step('start Stripe Checkout again and pay on the hosted page');
+await clickButton('Pay with Stripe');
+await chooseOnStripeCheckout('pay');
+await waitFor(
+  () => document.body.textContent.includes('Payment complete'),
+  20000,
+  'payment success panel after Stripe Checkout',
+);
+const stripeRef = await page.evaluate(() => {
+  const match = document.body.textContent.match(/payment reference is:\s*(cs_test_[a-z0-9]+)/);
+  return match ? match[1] : null;
+});
+if (!stripeRef) fail('payment reference is not a Stripe Checkout session id');
+console.log(`Stripe payment succeeded, reference: ${stripeRef}`);
+
+step('view my bookings and confirm both bookings are there');
 await page.click('a[href="/my-bookings"]');
 await waitFor(
-  (passenger) =>
-    location.pathname === '/my-bookings' && document.body.textContent.includes(passenger),
+  (passengers) =>
+    location.pathname === '/my-bookings' &&
+    [...document.querySelectorAll('dl')].filter((dl) =>
+      passengers.some((p) => dl.textContent.includes(p)),
+    ).length === passengers.length,
   15000,
-  'new booking to appear in my bookings',
-  PASSENGER,
+  'both new bookings to appear in my bookings',
+  [PASSENGER, STRIPE_PASSENGER],
 );
-console.log('booking listed for the passenger');
+console.log('bookings listed for both passengers');
 
-step('delete the booking');
-await page.evaluate((passenger) => {
-  const cards = [...document.querySelectorAll('dl')];
-  const card = cards.find((dl) => dl.textContent.includes(passenger));
-  card.closest('div').querySelector('button').click();
-}, PASSENGER);
-await waitFor(
-  (passenger) => !document.body.textContent.includes(passenger),
-  15000,
-  'booking to disappear after delete',
-  PASSENGER,
-);
-console.log('booking deleted');
+step('delete the bookings');
+// STRIPE_PASSENGER first: its name contains PASSENGER, so match the longer one while both exist
+for (const passenger of [STRIPE_PASSENGER, PASSENGER]) {
+  await page.evaluate((passenger) => {
+    const cards = [...document.querySelectorAll('dl')];
+    const card = cards.find((dl) => dl.textContent.includes(passenger));
+    card.closest('div').querySelector('button').click();
+  }, passenger);
+  await waitFor(
+    (passenger) => !document.body.textContent.includes(passenger),
+    15000,
+    `booking for ${passenger} to disappear after delete`,
+    passenger,
+  );
+}
+console.log('bookings deleted');
 
 step('log out');
 await clickButton('Log out');

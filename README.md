@@ -10,6 +10,7 @@ SolidJS UI that consumes the API end-to-end, including real OAuth login against 
 | European Rail Timetable | REST | `Train Travel Trips Service` (`wm-train-travel-trips`) | CSV data-driven + date-stamped response templating |
 | Rail Reservations | REST | `Train Travel Bookings Service` (`wm-train-travel-bookings`) | Stateful stubs: KV store, per-user state contexts (`X-User-Id`), `require-state` matching |
 | PayRail | **SOAP 1.1** | `Train Travel Payments Service` (`wm-train-travel-payments`) | Unstructured mock, body-matched SOAP stubs, masked-card templating |
+| Stripe | REST + hosted page | Stripe API template | Stateful Checkout Sessions API, **hosted Checkout page test double** |
 | Mock Google IdP | OAuth2 | Google OAuth2 template (`5e5y3`) | Auth-code flow, JWKS, **JWT access tokens with `read`/`write` scopes** |
 | Webhook receiver | REST sink | `Train Travel Webhook Receiver` (`wm-train-travel-webhook`) | Open-URL stub, request journal as webhook evidence |
 
@@ -74,6 +75,10 @@ points it elsewhere, and **Reset** returns to the default.
    `4000 0000 0000 0002`, which is declined: the error panel shows the gateway's actual decline
    reason (*"Payment was declined by the payment provider (card_declined)"*) and the booking stays
    payable, so you can succeed with `4242 4242 4242 4242` (or anything else) straight after.
+   Or click **Pay with Stripe**: the gateway creates a Stripe Checkout session and the browser is
+   sent to the (mocked) Stripe-hosted page. **Pay** returns you to the payment page, where the
+   gateway verifies the session with Stripe and confirms the booking; **Cancel** returns you with
+   the booking still payable.
 4. **My bookings** lists your (and only your) bookings — delete to release a hold.
 
 Every UI click exercises the same mocked stack as the curl walkthrough below: stations/trips from the
@@ -84,7 +89,7 @@ mock, and the login JWT comes from the same mocked Google IdP.
 
 [`e2e/journey.mjs`](e2e/journey.mjs) drives a real Chrome (via `puppeteer-core`) through the whole
 journey: log in via the mock IdP → find trips → book → declined card → approved payment →
-My bookings → delete → log out.
+book again → Stripe hosted Checkout (cancel, then pay) → My bookings → delete → log out.
 
 ```bash
 cd e2e

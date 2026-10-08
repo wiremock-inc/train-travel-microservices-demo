@@ -20,6 +20,14 @@ data class PaymentRequest(
     val source: PaymentSource,
 )
 
+data class CheckoutRequest(
+    @field:NotNull(message = "must not be null")
+    @field:DecimalMin(value = "0", inclusive = false, message = "must be greater than 0")
+    val amount: BigDecimal,
+    @field:NotNull(message = "must not be null")
+    val currency: String,
+)
+
 /** OneOf discriminator on the `object` field, exactly as the public spec defines it. */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "object")
 @JsonSubTypes(
@@ -93,3 +101,18 @@ data class BankAccountSourceResponse(
     @JsonProperty("object")
     val objectName: String = "bank_account"
 }
+
+/** A Stripe Checkout session the browser should be redirected to. */
+data class CheckoutSessionDto(
+    val id: String,
+    val url: String,
+)
+
+/** A payment taken on Stripe's hosted page: the gateway never sees the card, so there is no source. */
+data class CheckoutPaymentDto(
+    val id: String,
+    val amount: BigDecimal,
+    val currency: String,
+    val status: String,
+    val links: LinksDto,
+)
