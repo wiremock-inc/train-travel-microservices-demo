@@ -18,9 +18,7 @@ import { ObjectEnum } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { default as CardComponent } from '../components/card';
 import H1 from '../components/typeography/H1';
 import Spinner from '../components/spinner';
-
-// Bookings carry no price, so every payment route charges the same demo fare
-const FARE = { currency: CurrencyEnum.Gbp, amount: 1000 };
+import { fareFor } from '../lib/fares';
 
 const bookingFetcher = async (id: string) => {
   const response = await bookingsController.getBooking(id);
@@ -38,6 +36,11 @@ const Payment = () => {
   const [paymentError, setPaymentError] = createSignal<Error | undefined>();
   const bookingId = () => params.booking_id;
   const [booking] = createResource(bookingId, bookingFetcher);
+  const price = () => fareFor(params.booking_id);
+  const canPay = () =>
+    price() !== undefined && !isPosting() && paymentResult() === undefined;
+  // The API's trips have a price but no currency
+  const fare = () => ({ currency: CurrencyEnum.Gbp, amount: price()! });
 
   /** Prefer the gateway's RFC 7807 problem detail over the SDK's generic message. */
   const paymentErrorDetail = () => {
@@ -63,7 +66,7 @@ const Payment = () => {
     try {
       const session = await gatewayPost<{ url: string }>(
         `/bookings/${params.booking_id}/payment/checkout`,
-        FARE
+        fare()
       );
       window.location.href = session.url;
     } catch (e) {
@@ -103,7 +106,7 @@ const Payment = () => {
       const response = await paymentsController.createBookingPayment(
         params.booking_id,
         {
-          ...FARE,
+          ...fare(),
           source: {
             // the API's oneOf on source requires the object discriminator
             object: ObjectEnum.Card,
@@ -154,6 +157,9 @@ const Payment = () => {
 
                 <dt class="font-bold text-lg">Trip ID</dt>
                 <dd class="mb-2 text-base">{booking()?.tripId}</dd>
+
+                <dt class="font-bold text-lg">Price</dt>
+                <dd class="mb-2 text-base">{price() ?? 'Unknown'}</dd>
               </dl>
             </Show>
           </CardComponent>
@@ -191,7 +197,7 @@ const Payment = () => {
               <Row>
                 <Button
                   onClick={payWithStripe}
-                  disabled={isPosting() || paymentResult() !== undefined}
+                  disabled={!canPay()}
                 >
                   Pay with Stripe
                 </Button>
@@ -262,7 +268,7 @@ const Payment = () => {
 
               <Button
                 type="submit"
-                disabled={isPosting() || paymentResult() !== undefined}
+                disabled={!canPay()}
               >
                 Pay
               </Button>

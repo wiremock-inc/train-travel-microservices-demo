@@ -113,7 +113,10 @@ await waitFor(
 );
 console.log('logged in, landed on my-bookings');
 
-/** Finds Berlin -> München trips for tomorrow, books the first one and lands on its payment page. */
+/**
+ * Finds Berlin -> München trips for tomorrow, books the first one and lands on its payment page.
+ * Returns the price the trips table showed for it.
+ */
 async function bookTrip(passenger) {
   await page.goto(`${UI}/booking/new`, { waitUntil: 'domcontentloaded' });
   await waitFor(
@@ -148,7 +151,10 @@ async function bookTrip(passenger) {
   );
   await page.waitForSelector('table tbody tr', { timeout: 15000 });
   const tripCount = await page.$$eval('table tbody tr', (rows) => rows.length);
-  console.log(`trips found: ${tripCount}`);
+  const price = Number(
+    await page.$eval('table tbody tr:first-child td:nth-child(2)', (td) => td.textContent.trim()),
+  );
+  console.log(`trips found: ${tripCount}, first costs ${price}`);
 
   await page.click('table tbody tr:first-child button');
   await waitFor(
@@ -167,15 +173,29 @@ async function bookTrip(passenger) {
     'payment page after booking',
   );
   console.log(`booking created, payment page for ${page.url()}`);
+  return price;
 }
 
-/** Clicks an outcome button on the Stripe hosted Checkout page and waits to be sent back to the UI. */
-async function chooseOnStripeCheckout(outcome) {
+/**
+ * On the Stripe hosted Checkout page: checks it is charging the trip's price, clicks an outcome
+ * button and waits to be sent back to the UI.
+ */
+async function chooseOnStripeCheckout(outcome, price) {
   await waitFor(
     () => location.pathname.startsWith('/hosted/checkout/'),
     15000,
     'Stripe hosted Checkout page',
   );
+  // the hosted page shows the session amount in minor units
+  const expectedAmount = `${Math.round(price * 100)} gbp`;
+  const shownAmount = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('dt')].find((dt) => dt.textContent === 'Amount')
+        ?.nextElementSibling?.textContent ?? '(no amount shown)',
+  );
+  if (!shownAmount.startsWith(expectedAmount)) {
+    fail(`Stripe Checkout is charging "${shownAmount}" but the trip costs ${price} (expected "${expectedAmount}")`);
+  }
   const button = `[data-mock-outcome=${outcome}]`;
   await page.waitForSelector(button);
   await page.click(button);
@@ -230,11 +250,11 @@ const paymentRef = await page.evaluate(() => {
 console.log(`payment succeeded, reference: ${paymentRef}`);
 
 step('book a second trip to pay for with Stripe');
-await bookTrip(STRIPE_PASSENGER);
+const stripeTripPrice = await bookTrip(STRIPE_PASSENGER);
 
 step('start Stripe Checkout, then cancel on the hosted page');
 await clickButton('Pay with Stripe');
-await chooseOnStripeCheckout('cancel');
+await chooseOnStripeCheckout('cancel', stripeTripPrice);
 await waitFor(
   () => document.body.textContent.includes('Stripe payment was cancelled'),
   15000,
@@ -244,7 +264,7 @@ console.log('cancel surfaced in the UI, booking still HELD');
 
 step('start Stripe Checkout again and pay on the hosted page');
 await clickButton('Pay with Stripe');
-await chooseOnStripeCheckout('pay');
+await chooseOnStripeCheckout('pay', stripeTripPrice);
 await waitFor(
   () => document.body.textContent.includes('Payment complete'),
   20000,
