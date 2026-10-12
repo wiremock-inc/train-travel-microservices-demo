@@ -4,15 +4,16 @@
  * The SDK's own authorization-code helpers hard-code the spec's placeholder auth
  * server (https://example.com/oauth), so this module implements the browser flow
  * directly: build the authorize URL, redirect the whole window, then exchange the
- * returned code at the token endpoint. The IdP issues a scoped RS256 JWT which
- * the gateway validates locally against its JWKS.
+ * returned code at the token endpoint. As with real Google, the access token is
+ * opaque, so the app authenticates to the gateway with the ID token: an RS256 JWT
+ * the gateway validates locally against the IdP's JWKS.
  */
 
 const IDP_BASE_URL = 'https://5e5y3.wiremockapi.cloud';
 const CLIENT_ID = 'train-travel-demo';
-const SCOPES = 'openid email read write';
+const SCOPES = 'openid email';
 const STATE_STORAGE_KEY = 'traintravel.oauth_state';
-const TOKEN_STORAGE_KEY = 'traintravel.access_token';
+const TOKEN_STORAGE_KEY = 'traintravel.id_token';
 
 export const REDIRECT_PATH = '/callback';
 
@@ -41,7 +42,7 @@ export const login = () => {
 export const verifyState = (state: string | undefined): boolean =>
   !!state && state === sessionStorage.getItem(STATE_STORAGE_KEY);
 
-/** Exchanges the authorization code for the access token (JWT). */
+/** Exchanges the authorization code for the ID token (JWT). */
 export const exchangeCodeForToken = async (code: string): Promise<string> => {
   const response = await fetch(`${IDP_BASE_URL}/token`, {
     method: 'POST',
@@ -56,10 +57,10 @@ export const exchangeCodeForToken = async (code: string): Promise<string> => {
     throw new Error(`token endpoint returned ${response.status}`);
   }
   const json = await response.json();
-  if (!json.access_token) {
-    throw new Error('token response contained no access token');
+  if (!json.id_token) {
+    throw new Error('token response contained no ID token');
   }
-  return json.access_token as string;
+  return json.id_token as string;
 };
 
 export const loadToken = (): string | null =>

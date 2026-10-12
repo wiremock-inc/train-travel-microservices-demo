@@ -16,6 +16,9 @@ spring:
           # the JWKS endpoint and issuer validation. Note: tokens must be issued via this exact
           # base URL, because the IdP mints `iss` from the request's own base URL.
           issuer-uri: https://5e5y3.wiremockapi.cloud
+          # The bearer is an ID token, which is only meant for the client it was issued to:
+          # `aud` must be the UI's OAuth client ID.
+          audiences: train-travel-demo
 
 traintravel:
   public-base-url: http://localhost:8080

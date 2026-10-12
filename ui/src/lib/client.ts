@@ -14,8 +14,8 @@ export const DEFAULT_HOST = 'http://localhost:8080';
 
 const [host, setHost] = createSignal<string | false>(false);
 
-/** The OAuth access token, seeded from localStorage so sessions survive refreshes. */
-const [accessToken, setAccessToken] = createSignal<string | false>(
+/** The Google ID token sent as the bearer, seeded from localStorage so sessions survive refreshes. */
+const [idToken, setIdToken] = createSignal<string | false>(
   loadToken() || false
 );
 
@@ -31,7 +31,7 @@ createEffect(() => {
     host: (host() as string) || DEFAULT_HOST,
   };
 
-  const token = accessToken();
+  const token = idToken();
   if (token) {
     config.oAuthToken = { accessToken: token, tokenType: 'Bearer' };
   }
@@ -58,7 +58,7 @@ export const gatewayPost = async <T>(path: string, body?: unknown): Promise<T> =
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(accessToken() ? { Authorization: `Bearer ${accessToken()}` } : {}),
+      ...(idToken() ? { Authorization: `Bearer ${idToken()}` } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -72,14 +72,14 @@ export const gatewayPost = async <T>(path: string, body?: unknown): Promise<T> =
 /** Drops the stored token and rebuilds the controllers unauthenticated. */
 export const logout = () => {
   clearToken();
-  setAccessToken(false);
+  setIdToken(false);
 };
 
 export {
   setHost,
   host,
-  accessToken,
-  setAccessToken,
+  idToken,
+  setIdToken,
   stationsController,
   tripsController,
   bookingsController,
