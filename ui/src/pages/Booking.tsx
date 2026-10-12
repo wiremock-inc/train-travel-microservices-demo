@@ -9,6 +9,7 @@ import { bookingsController } from '../lib/client';
 import { createStore } from 'solid-js/store';
 import Card from '../components/card';
 import Hr from '../components/hr';
+import { fareFor, rememberFare } from '../lib/fares';
 
 const BookingPage: ParentComponent = () => {
   const params = useParams();
@@ -39,6 +40,7 @@ const BookingPage: ParentComponent = () => {
 
     const response = await bookingsController.createBooking(data);
 
+    rememberFare(response.result.id!, fareFor(params.trip_id));
     navigate(`/payment/${response.result.id}`);
   };
 

@@ -43,6 +43,32 @@ createEffect(() => {
   paymentsController = new PaymentsController(client);
 });
 
+/**
+ * Calls a gateway endpoint the generated SDK has no operation for (the Stripe Checkout
+ * endpoints), with the same host and bearer token the SDK controllers use.
+ */
+export const gatewayPost = async <T>(path: string, body?: unknown): Promise<T> => {
+  const override = host() as string;
+  const base = !override
+    ? DEFAULT_HOST
+    : /^https?:\/\//.test(override)
+      ? override
+      : `https://${override}`;
+  const response = await fetch(`${base}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(accessToken() ? { Authorization: `Bearer ${accessToken()}` } : {}),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const json = await response.json().catch(() => undefined);
+  if (!response.ok) {
+    throw new Error(json?.detail ?? `The gateway returned ${response.status}`);
+  }
+  return json as T;
+};
+
 /** Drops the stored token and rebuilds the controllers unauthenticated. */
 export const logout = () => {
   clearToken();

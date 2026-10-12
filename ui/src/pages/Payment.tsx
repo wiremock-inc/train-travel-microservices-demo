@@ -5,16 +5,20 @@ import Label from '../components/forms/label';
 import Row from '../components/forms/row';
 import Hr from '../components/hr';
 import H2 from '../components/typeography/H2';
-import { JSX, Show, createResource, createSignal } from 'solid-js';
-import { bookingsController, paymentsController } from '../lib/client';
-import { A, useParams } from '@solidjs/router';
+import { JSX, Show, createResource, createSignal, onMount } from 'solid-js';
+import {
+  bookingsController,
+  gatewayPost,
+  paymentsController,
+} from '../lib/client';
+import { A, useParams, useSearchParams } from '@solidjs/router';
 import { CurrencyEnum } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { Card } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { ObjectEnum } from '@wiremock-inc/apimatic-sdkgen-demo';
 import { default as CardComponent } from '../components/card';
 import H1 from '../components/typeography/H1';
 import Spinner from '../components/spinner';
-import { BookingsPaymentResponse } from '@wiremock-inc/apimatic-sdkgen-demo';
+import { fareFor } from '../lib/fares';
 
 const bookingFetcher = async (id: string) => {
   const response = await bookingsController.getBooking(id);
@@ -25,12 +29,18 @@ const Payment = () => {
   const params = useParams();
   const [form, setForm] = createStore<Card>({} as Card);
   const [isPosting, setIsPosting] = createSignal(false);
+  const [searchParams] = useSearchParams();
   const [paymentResult, setPaymentResult] = createSignal<
-    BookingsPaymentResponse | undefined
+    { id?: string } | undefined
   >();
   const [paymentError, setPaymentError] = createSignal<Error | undefined>();
   const bookingId = () => params.booking_id;
   const [booking] = createResource(bookingId, bookingFetcher);
+  const price = () => fareFor(params.booking_id);
+  const canPay = () =>
+    price() !== undefined && !isPosting() && paymentResult() === undefined;
+  // The API's trips have a price but no currency
+  const fare = () => ({ currency: CurrencyEnum.Gbp, amount: price()! });
 
   /** Prefer the gateway's RFC 7807 problem detail over the SDK's generic message. */
   const paymentErrorDetail = () => {
@@ -50,6 +60,44 @@ const Payment = () => {
     return error?.message;
   };
 
+  /** Hands the browser over to Stripe's hosted Checkout page. */
+  const payWithStripe = async () => {
+    setIsPosting(true);
+    try {
+      const session = await gatewayPost<{ url: string }>(
+        `/bookings/${params.booking_id}/payment/checkout`,
+        fare()
+      );
+      window.location.href = session.url;
+    } catch (e) {
+      setPaymentError(e as Error);
+      setIsPosting(false);
+    }
+  };
+
+  /** Back from Stripe: the gateway verifies the session and confirms the booking. */
+  onMount(async () => {
+    if (searchParams.stripe_cancelled) {
+      setPaymentError(
+        new Error('Stripe payment was cancelled. Your booking has not been paid.')
+      );
+      return;
+    }
+    const sessionId = searchParams.stripe_session_id;
+    if (!sessionId) return;
+    setIsPosting(true);
+    try {
+      setPaymentResult(
+        await gatewayPost<{ id: string }>(
+          `/bookings/${params.booking_id}/payment/checkout/${sessionId}/complete`
+        )
+      );
+    } catch (e) {
+      setPaymentError(e as Error);
+    }
+    setIsPosting(false);
+  });
+
   const submit: JSX.EventHandler<HTMLFormElement, Event> = async (e) => {
     e.preventDefault();
     setIsPosting(true);
@@ -58,8 +106,7 @@ const Payment = () => {
       const response = await paymentsController.createBookingPayment(
         params.booking_id,
         {
-          currency: CurrencyEnum.Gbp,
-          amount: 1000,
+          ...fare(),
           source: {
             // the API's oneOf on source requires the object discriminator
             object: ObjectEnum.Card,
@@ -110,6 +157,9 @@ const Payment = () => {
 
                 <dt class="font-bold text-lg">Trip ID</dt>
                 <dd class="mb-2 text-base">{booking()?.tripId}</dd>
+
+                <dt class="font-bold text-lg">Price</dt>
+                <dd class="mb-2 text-base">{price() ?? 'Unknown'}</dd>
               </dl>
             </Show>
           </CardComponent>
@@ -143,6 +193,19 @@ const Payment = () => {
                   </p>
                 </div>
               </Show>
+
+              <Row>
+                <Button
+                  onClick={payWithStripe}
+                  disabled={!canPay()}
+                >
+                  Pay with Stripe
+                </Button>
+              </Row>
+
+              <Hr />
+
+              <p class="mb-4 text-lg">Or pay by card</p>
 
               <Row>
                 <Label for="name">Name on card</Label>
@@ -205,7 +268,7 @@ const Payment = () => {
 
               <Button
                 type="submit"
-                disabled={isPosting() || paymentResult() !== undefined}
+                disabled={!canPay()}
               >
                 Pay
               </Button>

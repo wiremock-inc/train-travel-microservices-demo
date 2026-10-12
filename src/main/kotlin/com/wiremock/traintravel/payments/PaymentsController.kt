@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class PaymentsController(private val saga: PaymentSaga) {
+class PaymentsController(private val saga: PaymentSaga, private val checkout: StripeCheckout) {
 
     @PostMapping("/bookings/{bookingId}/payment")
     fun pay(
@@ -24,5 +24,29 @@ class PaymentsController(private val saga: PaymentSaga) {
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
             .body(saga.pay(currentUserId(auth), bookingId, request))
+    }
+
+    @PostMapping("/bookings/{bookingId}/payment/checkout")
+    fun startCheckout(
+        @PathVariable bookingId: String,
+        @Valid @RequestBody request: CheckoutRequest,
+        auth: JwtAuthenticationToken,
+    ): ResponseEntity<CheckoutSessionDto> {
+        requireUuid(bookingId, "bookingId")
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(checkout.start(currentUserId(auth), bookingId, request))
+    }
+
+    @PostMapping("/bookings/{bookingId}/payment/checkout/{sessionId}/complete")
+    fun completeCheckout(
+        @PathVariable bookingId: String,
+        @PathVariable sessionId: String,
+        auth: JwtAuthenticationToken,
+    ): ResponseEntity<CheckoutPaymentDto> {
+        requireUuid(bookingId, "bookingId")
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(checkout.complete(currentUserId(auth), bookingId, sessionId))
     }
 }

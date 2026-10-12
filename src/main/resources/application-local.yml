@@ -1,0 +1,16 @@
+# The `train-travel` environment on a local WireMock Cloud: every downstream the gateway has,
+# created together (and deleted together). Activate with SPRING_PROFILES_ACTIVE=local.
+# Plain http because the local ingress serves a self-signed certificate.
+traintravel:
+  stations:
+    base-url: http://o1v8e.local.wiremock.cloud
+  trips:
+    base-url: http://r6r2l.local.wiremock.cloud
+  bookings:
+    base-url: http://jmw36.local.wiremock.cloud
+  payments:
+    base-url: http://e6831.local.wiremock.cloud/payrail/v1
+  stripe:
+    base-url: http://v1q0j.local.wiremock.cloud
+  webhook:
+    url: http://gm0g7.local.wiremock.cloud/new-booking

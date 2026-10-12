@@ -10,6 +10,7 @@ import Cart from '../components/icons/cart';
 import Spinner from '../components/spinner';
 import Button from '../components/forms/button';
 import { Trip } from '@wiremock-inc/apimatic-sdkgen-demo';
+import { rememberFare } from '../lib/fares';
 
 const fetchStations = async () => {
   // The SDK exposes no limit parameter (its spec predates the limit param), so the
@@ -58,6 +59,7 @@ const BookingFindPage: Component = () => {
   const [trips] = createResource(derivedState, fetchTrips);
   const navigate = useNavigate();
   const selectTrip = (trip: Trip) => {
+    rememberFare(trip.id!, trip.price);
     navigate(`/booking/${trip.id}`);
   };
 

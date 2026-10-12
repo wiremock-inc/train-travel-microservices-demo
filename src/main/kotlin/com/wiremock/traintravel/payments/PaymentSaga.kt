@@ -8,6 +8,14 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Year
 
+private val currencies = setOf("bam", "bgn", "chf", "eur", "gbp", "nok", "sek", "try")
+
+internal fun requireSupportedCurrency(currency: String) {
+    if (currency !in currencies) {
+        throw BadRequestException("Field 'currency' must be one of: ${currencies.sorted().joinToString(", ")}.")
+    }
+}
+
 /**
  * The payment saga: validate the hold -> SOAP ProcessPayment -> on APPROVED confirm the
  * reservation. A DECLINED payment leaves the booking HELD and surfaces as a public 400.
@@ -18,8 +26,6 @@ class PaymentSaga(
     private val payRailClient: PayRailClient,
     private val props: AppProperties,
 ) {
-
-    private val currencies = setOf("bam", "bgn", "chf", "eur", "gbp", "nok", "sek", "try")
 
     fun pay(userId: String, bookingId: String, request: PaymentRequest): PaymentResponseDto {
         val currency = request.currency.lowercase()
@@ -39,9 +45,7 @@ class PaymentSaga(
     }
 
     private fun validate(request: PaymentRequest, currency: String) {
-        if (currency !in currencies) {
-            throw BadRequestException("Field 'currency' must be one of: ${currencies.sorted().joinToString(", ")}.")
-        }
+        requireSupportedCurrency(currency)
         when (val source = request.source) {
             is CardSourceDto -> {
                 if (source.name.isBlank()) throw BadRequestException("Field 'source.name' must not be blank.")

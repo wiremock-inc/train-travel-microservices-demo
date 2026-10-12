@@ -642,6 +642,121 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /bookings/{bookingId}/payment/checkout:
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        description: The ID of the booking to pay for.
+        schema:
+          type: string
+          format: uuid
+        example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+    post:
+      summary: Start a Stripe Checkout for a Booking
+      description: Creates a Stripe Checkout session for the booking. Redirect the user to the returned `url` to pay on Stripe's hosted page; Stripe sends them back to the payment page with the session ID, which is then passed to the complete operation.
+      operationId: create-booking-checkout
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - currency
+              properties:
+                amount:
+                  type: number
+                  exclusiveMinimum: 0
+                  examples:
+                    - 49.99
+                currency:
+                  type: string
+                  enum:
+                    - bam
+                    - bgn
+                    - chf
+                    - eur
+                    - gbp
+                    - nok
+                    - sek
+                    - try
+      responses:
+        '200':
+          description: Checkout session created
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/Cache-Control'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSession'
+              example:
+                id: cs_test_a1b2c3d4
+                url: https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /bookings/{bookingId}/payment/checkout/{sessionId}/complete:
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        description: The ID of the booking being paid for.
+        schema:
+          type: string
+          format: uuid
+        example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+      - name: sessionId
+        in: path
+        required: true
+        description: The ID of the Stripe Checkout session the user was sent back with.
+        schema:
+          type: string
+        example: cs_test_a1b2c3d4
+    post:
+      summary: Complete a Stripe Checkout for a Booking
+      description: Verifies with Stripe that the Checkout session was created for this booking and has been paid, then confirms the booking. Safe to call more than once.
+      operationId: complete-booking-checkout
+      tags:
+        - Payments
+      responses:
+        '200':
+          description: Payment successful
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/Cache-Control'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutPayment'
+              example:
+                id: cs_test_a1b2c3d4
+                amount: 49.99
+                currency: gbp
+                status: succeeded
+                links:
+                  booking: https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 webhooks:
   newBooking:
     post:
@@ -1046,6 +1161,34 @@ components:
             - succeeded
             - failed
           readOnly: true
+    CheckoutSession:
+      description: A Stripe Checkout session to send the user to.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The Stripe Checkout session ID.
+        url:
+          type: string
+          format: uri
+          description: The Stripe-hosted payment page to redirect the user to.
+    CheckoutPayment:
+      description: A payment for a booking taken on Stripe's hosted Checkout page. Card details never reach this API, so there is no `source`.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The Stripe Checkout session ID, used as the payment reference.
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum:
+            - succeeded
+        links:
+          $ref: '#/components/schemas/Links-Booking'
     Links-Booking:
       description: The link to the booking resource.
       type: object
