@@ -11,7 +11,7 @@ SolidJS UI that consumes the API end-to-end, including real OAuth login against 
 | Rail Reservations | REST | `Train Travel Bookings Service` (`wm-train-travel-bookings`) | Stateful stubs: KV store, per-user state contexts (`X-User-Id`), `require-state` matching |
 | PayRail | **SOAP 1.1** | `Train Travel Payments Service` (`wm-train-travel-payments`) | Unstructured mock, body-matched SOAP stubs, masked-card templating |
 | Stripe | REST + hosted page | Stripe API template | Stateful Checkout Sessions API, **hosted Checkout page test double** |
-| Mock Google IdP | OAuth2 | Google OAuth2 template (`5e5y3`) | Auth-code flow, JWKS, **JWT access tokens with `read`/`write` scopes** |
+| Mock Google IdP | OAuth2 | Google OAuth2 template (`5e5y3`) | Auth-code flow, JWKS, **RS256 ID tokens validated by the gateway** |
 | Webhook receiver | REST sink | `Train Travel Webhook Receiver` (`wm-train-travel-webhook`) | Open-URL stub, request journal as webhook evidence |
 
 Full design specs: [`docs/train-travel-microservices/`](docs/train-travel-microservices/). The API
@@ -34,10 +34,11 @@ hand-authored stub mappings deployed in WireMock Cloud live in [`stubs/`](stubs/
 The gateway starts on `http://localhost:8080`. All downstream base URLs are config properties —
 see [`src/main/resources/application.yml`](src/main/resources/application.yml).
 
-> **Note on the IdP:** the gateway validates JWTs against the mock IdP at
+> **Note on the IdP:** the gateway validates Google ID tokens against the mock IdP at
 > `https://5e5y3.wiremockapi.cloud`, and the IdP stamps the token's `iss` from whatever base URL issued it.
 > Get your tokens from that exact URL (as the script below does) or adjust
-> `spring.security.oauth2.resourceserver.jwt.issuer-uri` to match.
+> `spring.security.oauth2.resourceserver.jwt.issuer-uri` to match. The token's `aud` must also be the
+> app's client ID (`train-travel-demo`, set by `…jwt.audiences`).
 
 ## The UI app
 
@@ -66,7 +67,7 @@ points it elsewhere, and **Reset** returns to the default.
 ### Using the app
 
 1. **Log in** (navbar, top right). The browser redirects to the mock Google sign-in page — enter any
-   email, click *Continue* — and you're back, logged in with a scoped JWT stored in `localStorage`
+   email, click *Continue* — and you're back, logged in with a Google ID token stored in `localStorage`
    (sessions survive refreshes; **Log out** clears the token).
 2. **Book a trip**: pick two stations (e.g. Berlin Hauptbahnhof → München Hauptbahnhof) and a future
    date; the trips table lists available connections. Click **Book** on one, fill in the passenger
@@ -117,23 +118,22 @@ browser if you want the Google-styled page experience).
 AUTH=https://5e5y3.wiremockapi.cloud
 API=http://localhost:8080
 
-# "Log in" as demo@example.com with read+write scopes - the mock returns a 302 carrying the auth code
+# "Log in" as demo@example.com - the mock returns a 302 carrying the auth code
 LOCATION=$(curl -s -o /dev/null -D - -X POST "$AUTH/login" \
   --data-urlencode "clientId=train-travel-demo" \
   --data-urlencode "email=demo@example.com" \
-  --data-urlencode "scopes=openid email read write" \
+  --data-urlencode "scopes=openid email" \
   --data-urlencode "state=demo-state" \
   --data-urlencode "redirectUri=http://localhost:9090/callback" \
   | grep -i '^location:' | tr -d '\r')
 CODE=$(echo "$LOCATION" | sed -E 's/.*[?&]code=([^&]+).*/\1/')
 
-# Exchange the code for tokens - the access token is a real RS256 JWT carrying the requested scopes
+# Exchange the code for tokens - as with real Google the access token is opaque, so the bearer is
+# the ID token: an RS256 JWT with iss, aud, sub and email
 TOKEN=$(curl -s -X POST "$AUTH/token" \
   --data-urlencode "grant_type=authorization_code" \
-  --data-urlencode "code=$CODE" | jq -r .access_token)
+  --data-urlencode "code=$CODE" | jq -r .id_token)
 ```
-
-A **read-only** token (for the 403 demo): repeat with `scopes=openid email read`.
 
 ### 1. Find stations
 
@@ -207,7 +207,7 @@ curl -s -X DELETE "$API/bookings/$BOOKING_ID" -H "Authorization: Bearer $TOKEN" 
 | Flow | How |
 |---|---|
 | 401 | Drop the `Authorization` header |
-| 403 | Use the read-only token on any write (`POST /bookings` …) |
+| 401 wrong audience | Log in with a different `clientId` and use that token |
 | 400 past date | `date=2020-01-01` on `/trips` |
 | 400 unknown station | made-up UUID for `origin` on `/trips` |
 | 400 already paid | pay a CONFIRMED booking again |
@@ -222,7 +222,7 @@ Import both files from [`postman/`](postman/):
 1. `train-travel.postman_environment.json` (select it)
 2. `train-travel.postman_collection.json`
 
-The collection's first two requests script the same login → token exchange (capturing `access_token`
+The collection's first two requests script the same login → token exchange (capturing `id_token`
 automatically); every later request sends it as a bearer token. Run the collection top to bottom to walk
 the whole journey.
 

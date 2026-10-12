@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Train Travel API (gateway demo)",
-    "description": "Walks the full Train Travel journey against the Spring Boot gateway, backed entirely by WireMock Cloud mocks. Steps 1-2 script the OAuth authorization-code flow against the mock Google IdP and capture the JWT access token automatically.",
+    "description": "Walks the full Train Travel journey against the Spring Boot gateway, backed entirely by WireMock Cloud mocks. Steps 1-2 script the OAuth authorization-code flow against the mock Google IdP and capture the JWT ID token automatically.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -18,7 +18,7 @@
     }
   ],
   "variable": [
-    { "key": "access_token", "value": "" },
+    { "key": "id_token", "value": "" },
     { "key": "station_id_berlin", "value": "" },
     { "key": "station_id_munich", "value": "" },
     { "key": "trip_id", "value": "" },
@@ -49,7 +49,7 @@
           "urlencoded": [
             { "key": "clientId", "value": "train-travel-demo", "type": "text" },
             { "key": "email", "value": "demo@example.com", "type": "text" },
-            { "key": "scopes", "value": "openid email read write", "type": "text" },
+            { "key": "scopes", "value": "openid email", "type": "text" },
             { "key": "state", "value": "demo-state", "type": "text" },
             { "key": "redirectUri", "value": "http://localhost:9090/callback", "type": "text" }
           ]
@@ -62,7 +62,7 @@
       }
     },
     {
-      "name": "2. Exchange code for JWT access token",
+      "name": "2. Exchange code for JWT ID token",
       "event": [
         {
           "listen": "test",
@@ -70,8 +70,8 @@
             "type": "text/javascript",
             "exec": [
               "const json = pm.response.json();",
-              "pm.collectionVariables.set('access_token', json.access_token);",
-              "pm.test('issued a JWT access token', () => pm.expect(json.access_token.split('.')).to.have.lengthOf(3));"
+              "pm.collectionVariables.set('id_token', json.id_token);",
+              "pm.test('issued a JWT ID token', () => pm.expect(json.id_token.split('.')).to.have.lengthOf(3));"
             ]
           }
         }
@@ -109,7 +109,7 @@
         }
       ],
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
         "header": [],
         "url": {
@@ -136,7 +136,7 @@
         }
       ],
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
         "header": [],
         "url": {
@@ -163,7 +163,7 @@
         }
       ],
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
         "header": [],
         "url": {
@@ -194,7 +194,7 @@
         }
       ],
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
@@ -211,7 +211,7 @@
     {
       "name": "7. Pay booking (approved card 4242)",
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
@@ -228,7 +228,7 @@
     {
       "name": "8. Double payment (400 - already paid)",
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
@@ -245,7 +245,7 @@
     {
       "name": "9. Declined card (400 - booking stays HELD)",
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
@@ -262,7 +262,7 @@
     {
       "name": "10. List my bookings",
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
         "header": [],
         "url": {
@@ -275,7 +275,7 @@
     {
       "name": "11. Past-date trips (400)",
       "request": {
-        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }] },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
         "header": [],
         "url": {

@@ -3,7 +3,7 @@ import { createSignal, JSX, ParentComponent, Show } from 'solid-js';
 import styles from './App.module.css';
 import { A } from '@solidjs/router';
 import Input from './components/forms/input';
-import { accessToken, logout, setHost, host } from './lib/client';
+import { idToken, logout, setHost, host } from './lib/client';
 import { login } from './lib/auth';
 import Button from './components/forms/button';
 
@@ -85,10 +85,10 @@ const App: ParentComponent = (props) => {
             <Show when={host()}>
               <Button onClick={() => resetHost()}>Reset</Button>
             </Show>
-            <Show when={!accessToken()}>
+            <Show when={!idToken()}>
               <Button onClick={() => login()}>Log in</Button>
             </Show>
-            <Show when={accessToken()}>
+            <Show when={idToken()}>
               <Button onClick={() => logout()}>Log out</Button>
             </Show>
           </div>

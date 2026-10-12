@@ -65,4 +65,4 @@ private fun encode(value: String): String = URLEncoder.encode(value, Charsets.UT
 /** The authenticated user's identity (JWT `sub`) - forwarded to the bookings service as X-User-Id. */
 fun currentUserId(auth: JwtAuthenticationToken): String =
     auth.token.claims["sub"]?.toString()
-        ?: throw BadRequestException("The access token has no subject claim.")
+        ?: throw BadRequestException("The ID token has no subject claim.")

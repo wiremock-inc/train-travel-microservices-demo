@@ -1,16 +1,19 @@
-# The `train-travel` environment on a local WireMock Cloud: every downstream the gateway has,
-# created together (and deleted together). Activate with SPRING_PROFILES_ACTIVE=local.
+# The gateway's downstreams in an environment on a local WireMock Cloud. Activate with
+# SPRING_PROFILES_ACTIVE=local.
+#
+# The URLs below are PLACEHOLDERS and must be updated before use: replace each <...-mock-id> with
+# the ID of the matching mock API in your environment (the IDs change whenever it is recreated).
 # Plain http because the local ingress serves a self-signed certificate.
 traintravel:
   stations:
-    base-url: http://o1v8e.local.wiremock.cloud
+    base-url: http://<stations-mock-id>.local.wiremock.cloud
   trips:
-    base-url: http://r6r2l.local.wiremock.cloud
+    base-url: http://<trips-mock-id>.local.wiremock.cloud
   bookings:
-    base-url: http://jmw36.local.wiremock.cloud
+    base-url: http://<bookings-mock-id>.local.wiremock.cloud
   payments:
-    base-url: http://e6831.local.wiremock.cloud/payrail/v1
+    base-url: http://<payrail-mock-id>.local.wiremock.cloud/payrail/v1
   stripe:
-    base-url: http://v1q0j.local.wiremock.cloud
+    base-url: http://<stripe-mock-id>.local.wiremock.cloud
   webhook:
-    url: http://gm0g7.local.wiremock.cloud/new-booking
+    url: http://<webhook-mock-id>.local.wiremock.cloud/new-booking

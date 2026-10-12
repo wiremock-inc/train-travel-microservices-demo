@@ -1,7 +1,7 @@
 import { Component, createSignal, onMount, Show } from 'solid-js';
 import { useNavigate, useSearchParams } from '@solidjs/router';
 import { exchangeCodeForToken, saveToken, verifyState } from '../lib/auth';
-import { setAccessToken } from '../lib/client';
+import { setIdToken } from '../lib/client';
 import H2 from '../components/typeography/H2';
 import Button from '../components/forms/button';
 import Spinner from '../components/spinner';
@@ -25,7 +25,7 @@ const CallbackPage: Component = () => {
     try {
       const token = await exchangeCodeForToken(code);
       saveToken(token);
-      setAccessToken(token);
+      setIdToken(token);
       navigate('/my-bookings', { replace: true });
     } catch (e) {
       setError(`Login failed: ${(e as Error).message}`);

@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer
@@ -43,9 +42,8 @@ class SecurityConfig {
         http.csrf { it.disable() }
             .cors { }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers(HttpMethod.POST, "/bookings/**").hasAuthority("SCOPE_write")
-                    .requestMatchers(HttpMethod.DELETE, "/bookings/**").hasAuthority("SCOPE_write")
-                    .anyRequest().hasAuthority("SCOPE_read")
+                // The bearer is a Google ID token, which carries no scopes: signing in is all it takes
+                auth.anyRequest().authenticated()
             }
             .exceptionHandling { handling ->
                 handling.authenticationEntryPoint(ProblemAuthenticationEntryPoint())
@@ -72,7 +70,7 @@ class ProblemAuthenticationEntryPoint : AuthenticationEntryPoint {
     }
 }
 
-/** Renders 403s (scope failures) as RFC 7807 problem+json. */
+/** Renders 403s as RFC 7807 problem+json. */
 class ProblemAccessDeniedHandler : AccessDeniedHandler {
     override fun handle(
         request: HttpServletRequest,
