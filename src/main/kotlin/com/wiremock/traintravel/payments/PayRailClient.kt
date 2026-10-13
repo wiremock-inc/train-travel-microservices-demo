@@ -9,7 +9,9 @@ import com.wiremock.traintravel.payrail.generated.ObjectFactory
 import com.wiremock.traintravel.payrail.generated.PaymentMethod
 import com.wiremock.traintravel.payrail.generated.ProcessPaymentRequest
 import com.wiremock.traintravel.payrail.generated.ProcessPaymentResponse
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.ws.client.WebServiceClientException
 import org.springframework.ws.client.core.WebServiceTemplate
 import org.springframework.ws.soap.SoapFaultException
 import org.springframework.ws.soap.client.core.SoapActionCallback
@@ -30,6 +32,8 @@ data class PayRailApproval(
  */
 @Component
 class PayRailClient(private val template: WebServiceTemplate) {
+
+    private val log = LoggerFactory.getLogger(PayRailClient::class.java)
 
     fun processPayment(
         merchantReference: String,
@@ -85,10 +89,14 @@ class PayRailClient(private val template: WebServiceTemplate) {
         } catch (fault: SoapFaultException) {
             // SoapFaultException's message is the SOAP fault string
             val faultText = fault.message ?: "unknown SOAP fault"
+            log.error("processPayment {} returned a SOAP fault: {}", template.defaultUri, faultText)
             if (faultText.contains("VALIDATION")) {
                 throw PayRailValidationException("The payment provider rejected the request: $faultText")
             }
             throw DownstreamException("PayRail SOAP fault: $faultText")
+        } catch (e: WebServiceClientException) {
+            log.error("processPayment {} failed: {}", template.defaultUri, e.toString())
+            throw e
         }
     }
 }
