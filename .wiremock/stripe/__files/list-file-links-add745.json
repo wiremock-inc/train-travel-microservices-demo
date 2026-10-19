@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.file}}{{#neq (jsonPath it '$.file') request.query.file.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.expired}}{{#if (jsonPath it '$.expired')}}{{#neq 'true' (lower request.query.expired.0)}}{{val false assign='keep'}}{{/neq}}{{else}}{{#neq 'false' (lower request.query.expired.0)}}{{val false assign='keep'}}{{/neq}}{{/if}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/file_links"
-}
-{{/formatJson}}

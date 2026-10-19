@@ -1,3 +1,0 @@
-{{#formatJson}}
-{{state request.path.subscription_exposed_id context=(stringFormat 'sub_discounts%s' sfx)}}
-{{/formatJson}}

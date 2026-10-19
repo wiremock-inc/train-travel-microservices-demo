@@ -1,1 +1,0 @@
-{{#formatJson}}{{state csSess context=(stringFormat 'checkout_sessions%s' sfx)}}{{/formatJson}}

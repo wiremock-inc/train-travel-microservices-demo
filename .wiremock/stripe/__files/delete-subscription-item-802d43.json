@@ -1,5 +1,0 @@
-{
-  "id": "{{request.path.item}}",
-  "object": "subscription_item",
-  "deleted": true
-}

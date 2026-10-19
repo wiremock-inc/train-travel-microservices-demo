@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.destination}}{{#neq (jsonPath it '$.destination') request.query.destination.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.transfer_group}}{{#neq (jsonPath it '$.transfer_group') request.query.transfer_group.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/transfers"
-}
-{{/formatJson}}

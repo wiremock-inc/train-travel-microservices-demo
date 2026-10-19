@@ -1,7 +1,0 @@
-{
-  "error": {
-    "code": "resource_missing",
-    "message": "No such checkout session client secret: '{{request.path.client_secret}}'",
-    "type": "invalid_request_error"
-  }
-}

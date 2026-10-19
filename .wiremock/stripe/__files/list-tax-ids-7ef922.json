@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if (lookup request.query 'owner[customer]')}}{{#neq (jsonPath it '$.owner.customer') (lookup request.query 'owner[customer]').0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if (lookup request.query 'owner[type]')}}{{#neq (jsonPath it '$.owner.type') (lookup request.query 'owner[type]').0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/tax_ids"
-}
-{{/formatJson}}

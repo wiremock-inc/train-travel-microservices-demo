@@ -1,5 +1,0 @@
-{
-  "id": "{{request.path.test_clock}}",
-  "object": "test_helpers.test_clock",
-  "deleted": true
-}

@@ -1,3 +1,0 @@
-{{#formatJson}}
-{{state evtId context='v2_events'}}
-{{/formatJson}}

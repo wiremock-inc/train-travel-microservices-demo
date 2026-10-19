@@ -1,5 +1,0 @@
-{
-  "id": "{{request.path.configuration}}",
-  "object": "terminal.configuration",
-  "deleted": true
-}

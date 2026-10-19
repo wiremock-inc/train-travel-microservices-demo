@@ -1,7 +1,0 @@
-{{#formatJson}}
-{
-  "created": {{now format='unix'}},
-  "object": "login_link",
-  "url": "{{request.baseUrl}}/hosted/express/{{id}}"
-}
-{{/formatJson}}

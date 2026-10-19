@@ -1,1 +1,0 @@
-<!doctype html><title>Redirecting</title><a href="{{val (state request.path.link context='account_links') assign='lk'}}{{#if (jsonPath lk '$.return_url' default='')}}{{jsonPath lk '$.return_url'}}{{else}}{{request.baseUrl}}/hosted/connect/setup/{{request.path.link}}{{/if}}">Continue</a>

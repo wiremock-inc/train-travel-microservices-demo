@@ -1,3 +1,0 @@
-{{val (jsonPath pk1 '$.extId' default='') assign='extId'}}{{#formatJson}}
-{{state extId context=ctx}}
-{{/formatJson}}

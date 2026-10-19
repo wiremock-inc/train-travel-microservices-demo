@@ -1,3 +1,0 @@
-{{val (jsonPath pk2 '$.evt1Payload' default='') assign='evt1Payload'}}{{#formatJson}}
-{{evt1Payload}}
-{{/formatJson}}

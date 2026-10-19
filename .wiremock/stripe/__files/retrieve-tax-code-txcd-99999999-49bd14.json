@@ -1,9 +1,0 @@
-{
-  "id": "txcd_99999999",
-  "object": "tax_code",
-  "description": "A physical good that can be moved or touched. Also known as tangible personal property.",
-  "name": "General - Tangible Goods",
-  "requirements": {
-    "performance_location": "optional"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "device_code": "{{randomValue type='UUID'}}",
-  "user_code": "{{randomValue length=4 type='ALPHANUMERIC' uppercase=true}}-{{randomValue length=4 type='ALPHANUMERIC' uppercase=true}}",
-  "verification_url": "{{request.baseUrl}}/device",
-  "verification_uri": "{{request.baseUrl}}/device",
-  "expires_in": 1800,
-  "interval": 5
-}

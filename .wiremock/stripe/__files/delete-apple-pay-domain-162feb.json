@@ -1,5 +1,0 @@
-{
-  "id": "{{request.path.domain}}",
-  "object": "apple_pay_domain",
-  "deleted": true
-}

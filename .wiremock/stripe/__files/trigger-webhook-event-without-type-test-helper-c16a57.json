@@ -1,9 +1,0 @@
-{
-  "error": {
-    "code": "parameter_missing",
-    "doc_url": "https://stripe.com/docs/error-codes/parameter-missing",
-    "message": "Missing required param: type.",
-    "type": "invalid_request_error",
-    "param": "type"
-  }
-}

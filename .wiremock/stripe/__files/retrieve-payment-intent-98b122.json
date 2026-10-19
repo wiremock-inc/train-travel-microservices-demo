@@ -1,7 +1,0 @@
-{{#assign 'd'}}
-{{#if (state request.path.intent context=(stringFormat 'pi_settle%s' sfx))}}{{#jsonMerge (state request.path.intent context=(stringFormat 'payment_intents%s' sfx))}}
-{
-  "status": "{{jsonPath (state request.path.intent context=(stringFormat 'pi_settle%s' sfx)) '$.status'}}"
-}
-{{/jsonMerge}}{{else}}{{state request.path.intent context=(stringFormat 'payment_intents%s' sfx)}}{{/if}}
-{{/assign}}{{val (jsonPath d '$.latest_charge' default='') assign='lc'}}{{val '' assign='chd'}}{{#if lc}}{{#if (matches (stringFormat '%s' lc) '^(ch|py)_[A-Za-z0-9]+$')}}{{#if (state lc context=(stringFormat 'charges%s' sfx))}}{{val (state lc context=(stringFormat 'charges%s' sfx)) assign='chd'}}{{/if}}{{/if}}{{/if}}{{#formatJson}}{{#if chd}}{{#jsonMerge d}}{"charges":{"object":"list","data":[{{{chd}}}],"has_more":false,"total_count":1,"url":"/v1/charges?payment_intent={{request.path.intent}}"} }{{/jsonMerge}}{{else}}{{{d}}}{{/if}}{{/formatJson}}

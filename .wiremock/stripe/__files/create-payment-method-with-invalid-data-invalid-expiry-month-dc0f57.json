@@ -1,9 +1,0 @@
-{
-  "error": {
-    "code": "invalid_expiry_month",
-    "doc_url": "https://stripe.com/docs/error-codes/invalid-expiry-month",
-    "message": "Your card's expiration month is invalid.",
-    "param": "exp_month",
-    "type": "card_error"
-  }
-}

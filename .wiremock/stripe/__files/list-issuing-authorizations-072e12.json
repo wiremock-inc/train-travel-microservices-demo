@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{val '' assign='idx'}}{{#if (state 'authorizations' context=(stringFormat 'issuing_order%s' sfx))}}{{val (state 'authorizations' context=(stringFormat 'issuing_order%s' sfx)) assign='idx'}}{{/if}}{{#if idx}}{{#each (jsonPath idx '$') as |oid|}}{{val '' assign='it'}}{{#if (state (stringFormat '%s' oid) context=(stringFormat 'issuing_authorizations%s' sfx))}}{{val (state (stringFormat '%s' oid) context=(stringFormat 'issuing_authorizations%s' sfx)) assign='it'}}{{/if}}{{#if it}}{{val true assign='keep'}}{{#if request.query.card}}{{#neq (jsonPath it '$.card.id' default='') request.query.card.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.cardholder}}{{#neq (jsonPath it '$.cardholder' default='') request.query.cardholder.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.status}}{{#neq (jsonPath it '$.status' default='') request.query.status.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/if}}{{/each}}{{/if}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/issuing/authorizations"
-}
-{{/formatJson}}

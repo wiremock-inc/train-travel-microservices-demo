@@ -1,13 +1,11 @@
 services:
   stripe:
-    type: 'REST'
+    template: org/stripe
     name: 'stripe'
-    path: './stripe'
     port: 8080
   google-idp:
-    type: 'REST'
+    template: org/google-sign-in
     name: 'google-idp'
-    path: './google-idp'
     port: 8081
   stations:
     type: 'REST'

@@ -1,6 +1,0 @@
-{
-  "error": {
-    "message": "Invalid account session client secret: '{{request.path.client_secret}}'",
-    "type": "invalid_request_error"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "error": {
-    "code": "resource_missing",
-    "message": "No dispute found for charge: '{{request.path.charge}}'",
-    "type": "invalid_request_error"
-  }
-}

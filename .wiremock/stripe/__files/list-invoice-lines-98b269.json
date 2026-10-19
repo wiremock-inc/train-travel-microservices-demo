@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{#each (listState linesCtx) as |l|}}{{#unless (jsonPath l '$.none')}}{{#if acc}}{{val (stringFormat '%s,%s' l acc) assign='acc'}}{{else}}{{val l assign='acc'}}{{/if}}{{/unless}}{{/each}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/invoices/{{id}}/lines"
-}
-{{/formatJson}}

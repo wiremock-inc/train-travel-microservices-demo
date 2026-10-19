@@ -1,7 +1,0 @@
-{
-  "id": "{{request.path.reader}}",
-  "object": "terminal.reader",
-  "deleted": true,
-  "device_type": "{{jsonPath prev '$.device_type'}}",
-  "serial_number": "{{jsonPath prev '$.serial_number'}}"
-}

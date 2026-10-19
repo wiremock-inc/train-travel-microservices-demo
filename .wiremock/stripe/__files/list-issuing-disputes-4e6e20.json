@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.transaction}}{{#neq (jsonPath it '$.transaction') request.query.transaction.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.status}}{{#neq (jsonPath it '$.status') request.query.status.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/issuing/disputes"
-}
-{{/formatJson}}

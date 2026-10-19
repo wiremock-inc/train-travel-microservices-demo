@@ -1,1 +1,0 @@
-{{#formatJson}}{{state piId context=(stringFormat 'payment_intents%s' sfx)}}{{/formatJson}}

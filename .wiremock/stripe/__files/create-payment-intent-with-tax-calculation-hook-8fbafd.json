@@ -1,3 +1,0 @@
-{{val (jsonPath pk1 '$.piId' default='') assign='piId'}}{{#formatJson}}
-{{state piId context=(stringFormat 'payment_intents%s' sfx)}}
-{{/formatJson}}

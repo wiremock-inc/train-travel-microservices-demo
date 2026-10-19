@@ -1,6 +1,0 @@
-{
-  "object": "list",
-  "data": [],
-  "has_more": false,
-  "url": "/v1/billing/meters/{{request.path.id}}/event_summaries"
-}

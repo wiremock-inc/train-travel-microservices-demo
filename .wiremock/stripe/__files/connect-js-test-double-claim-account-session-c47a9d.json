@@ -1,3 +1,0 @@
-{{#formatJson}}
-{{state request.path.client_secret context='connect_js_sessions'}}
-{{/formatJson}}

@@ -1,9 +1,0 @@
-{{#formatJson}}
-{
-  "object": "list",
-  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.lookup_key}}{{#neq (jsonPath it '$.lookup_key') request.query.lookup_key.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.archived}}{{#if (jsonPath it '$.active')}}{{#neq 'false' (lower request.query.archived.0)}}{{val false assign='keep'}}{{/neq}}{{else}}{{#neq 'true' (lower request.query.archived.0)}}{{val false assign='keep'}}{{/neq}}{{/if}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
-  ],
-  "has_more": false,
-  "url": "/v1/entitlements/features"
-}
-{{/formatJson}}

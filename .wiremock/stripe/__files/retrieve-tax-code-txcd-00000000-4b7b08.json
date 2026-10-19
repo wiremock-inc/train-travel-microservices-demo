@@ -1,9 +1,0 @@
-{
-  "id": "txcd_00000000",
-  "object": "tax_code",
-  "description": "Any nontaxable good or service which can be used to ensure no tax is applied, even for jurisdictions that impose a tax.",
-  "name": "Nontaxable",
-  "requirements": {
-    "performance_location": "optional"
-  }
-}

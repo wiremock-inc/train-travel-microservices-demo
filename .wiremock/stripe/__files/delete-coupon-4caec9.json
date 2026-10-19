@@ -1,5 +1,0 @@
-{
-  "id": "{{request.path.coupon}}",
-  "object": "coupon",
-  "deleted": true
-}

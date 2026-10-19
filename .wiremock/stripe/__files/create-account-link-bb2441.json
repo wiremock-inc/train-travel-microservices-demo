@@ -1,8 +1,0 @@
-{{#formatJson}}
-{
-  "created": {{now format='unix'}},
-  "expires_at": {{now offset='5 minutes' format='unix'}},
-  "object": "account_link",
-  "url": "{{request.baseUrl}}/hosted/connect/setup/{{id}}"
-}
-{{/formatJson}}

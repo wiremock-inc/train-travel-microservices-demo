@@ -1,9 +1,0 @@
-{
-  "error": {
-    "code": "invalid_cvc",
-    "doc_url": "https://stripe.com/docs/error-codes/invalid-cvc",
-    "message": "Your card's security code is invalid.",
-    "param": "cvc",
-    "type": "card_error"
-  }
-}
