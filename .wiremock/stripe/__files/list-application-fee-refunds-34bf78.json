@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/application_fees/{{request.path.id}}/refunds"
+}
+{{/formatJson}}

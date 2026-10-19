@@ -1,0 +1,1 @@
+{{#formatJson}}{ "error":{{#jsonMerge cfErr}}{ "payment_intent":{{state piId context=(stringFormat 'payment_intents%s' sfx)}} }{{/jsonMerge}} }{{/formatJson}}

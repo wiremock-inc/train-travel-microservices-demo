@@ -1,0 +1,23 @@
+{
+  "id": "payout_reconciliation.itemized.7",
+  "object": "reporting.report_type",
+  "data_available_end": 1790665200,
+  "data_available_start": 1790553600,
+  "default_columns": [
+    "automatic_payout_id",
+    "automatic_payout_effective_at",
+    "balance_transaction_id",
+    "created",
+    "available_on",
+    "currency",
+    "gross",
+    "fee",
+    "net",
+    "reporting_category",
+    "description"
+  ],
+  "livemode": false,
+  "name": "Itemized payout reconciliation",
+  "updated": 1790665200,
+  "version": 7
+}

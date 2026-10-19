@@ -1,0 +1,5 @@
+{{#formatJson}}
+{{#if (jsonPath (state request.path.refund context=(stringFormat 'refund_settle%s' sfx)) '$.status')}}{{#jsonMerge (state request.path.refund context=(stringFormat 'refunds%s' sfx))}}
+{{{state request.path.refund context=(stringFormat 'refund_settle%s' sfx)}}}
+{{/jsonMerge}}{{else}}{{state request.path.refund context=(stringFormat 'refunds%s' sfx)}}{{/if}}
+{{/formatJson}}

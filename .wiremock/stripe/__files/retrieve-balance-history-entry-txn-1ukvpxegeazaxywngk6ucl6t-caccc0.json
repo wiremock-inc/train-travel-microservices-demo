@@ -1,0 +1,40 @@
+{
+  "id": "txn_1UKvPXEGEazAXyWNgK6UcL6T",
+  "object": "balance_transaction",
+  "amount": -735850,
+  "available_on": 1791244800,
+  "balance_type": "payments",
+  "created": 1790666711,
+  "currency": "huf",
+  "description": "Funds reversed due to payment py_3UKvJbEGEazAXyWN0JbZzFIu failed",
+  "exchange_rate": 367.925,
+  "fee": 107783,
+  "fee_details": [
+    {
+      "amount": 135000,
+      "application": null,
+      "currency": "huf",
+      "description": "Payment failure fees",
+      "type": "stripe_fee"
+    },
+    {
+      "amount": -14717,
+      "application": null,
+      "currency": "huf",
+      "description": "Stripe currency conversion fee",
+      "type": "stripe_fee"
+    },
+    {
+      "amount": -12500,
+      "application": null,
+      "currency": "huf",
+      "description": "Stripe processing fees",
+      "type": "stripe_fee"
+    }
+  ],
+  "net": -843633,
+  "reporting_category": "charge_failure",
+  "source": "py_3UKvJbEGEazAXyWN0JbZzFIu",
+  "status": "pending",
+  "type": "payment_failure_refund"
+}

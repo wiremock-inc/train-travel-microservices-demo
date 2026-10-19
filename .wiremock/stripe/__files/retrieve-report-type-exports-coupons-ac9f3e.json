@@ -1,0 +1,23 @@
+{
+  "id": "exports.coupons",
+  "object": "reporting.report_type",
+  "data_available_end": 1790665200,
+  "data_available_start": 1790553600,
+  "default_columns": [
+    "id",
+    "Created (UTC)",
+    "Valid",
+    "Duration",
+    "Duration In Months",
+    "Percent Off",
+    "Amount Off",
+    "Currency",
+    "Redeem By (UTC)",
+    "Max Redemptions",
+    "Times Redeemed"
+  ],
+  "livemode": false,
+  "name": "Coupons export",
+  "updated": 1790665200,
+  "version": 1
+}

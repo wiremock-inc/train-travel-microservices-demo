@@ -1,0 +1,24 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "account": "fca_mock_checking",
+      "amount": -1250,
+      "currency": "usd",
+      "description": "Coffee shop",
+      "id": "fctxn_mock_0001",
+      "livemode": false,
+      "object": "financial_connections.transaction",
+      "status": "posted",
+      "status_transitions": {
+        "posted_at": null,
+        "void_at": null
+      },
+      "transacted_at": 1790600000,
+      "transaction_refresh": "fctxnref_mock",
+      "updated": 1790600000
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/financial_connections/transactions"
+}

@@ -1,0 +1,10 @@
+{{#formatJson}}
+{{formData request.body 'form' urlDecode=true}}{
+  "created": {{now format='unix'}},
+  "id": "{{request.path.id}}",
+  "livemode": false,
+  "name": {{#if form.name}}"{{form.name}}"{{else}}"string"{{/if}},
+  "object": "sigma.sigma_api_query",
+  "sql": {{#if form.sql}}"{{form.sql}}"{{else}}"string"{{/if}}
+}
+{{/formatJson}}

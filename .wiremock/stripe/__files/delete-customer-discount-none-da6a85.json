@@ -1,0 +1,6 @@
+{
+  "error": {
+    "message": "No active discount for customer: {{request.path.customer}}",
+    "type": "invalid_request_error"
+  }
+}

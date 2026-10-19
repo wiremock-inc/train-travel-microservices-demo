@@ -1,0 +1,20 @@
+{{#trim}}
+{{formData request.body 'form' urlDecode=true}}
+{{formData (base64 form.code decode=true padding=false) 'parts'}}
+{{#if parts.e}}{{#assign 'emailAddress'}}{{parts.e}}{{/assign}}{{/if}}
+{{#assign 'clientId'}}{{parts.c}}{{/assign}}
+{{#if parts.n}}{{#assign 'nonce'}}{{parts.n}}{{/assign}}{{/if}}
+{{#if parts.g}}{{#assign 'givenName'}}{{parts.g}}{{/assign}}{{/if}}
+{{#if parts.f}}{{#assign 'familyName'}}{{parts.f}}{{/assign}}{{/if}}
+{{#assign 'subject'}}{{parts.s}}{{/assign}}
+{{#assign 'accessToken'}}{{{base64 (stringFormat 'access..%s' form.code) padding=false}}}{{/assign}}
+{{#assign 'idToken'}}{{#trim}}
+{{{jwt alg='RS256' email=emailAddress given_name=givenName family_name=familyName iss=request.requestLine.baseUrl aud=clientId azp=clientId sub=subject nonce=nonce}}}
+{{/trim}}{{/assign}}
+
+{
+  "access_token":"{{{accessToken}}}",
+  "token_type": "Bearer",
+  "id_token": "{{{idToken}}}"
+}
+{{/trim}}

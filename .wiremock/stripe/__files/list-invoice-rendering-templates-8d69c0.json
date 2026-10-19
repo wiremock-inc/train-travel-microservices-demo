@@ -1,0 +1,19 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [
+  {
+    "created": 1790000000,
+    "id": "inrtem_mock0000000000default",
+    "livemode": false,
+    "metadata": {},
+    "nickname": "Default template",
+    "object": "invoice_rendering_template",
+    "status": "{{#if (state 'inrtem_mock0000000000default' context=(stringFormat 'rendering_templates%s' sfx))}}{{jsonPath (state 'inrtem_mock0000000000default' context=(stringFormat 'rendering_templates%s' sfx)) '$.status'}}{{else}}active{{/if}}",
+    "version": 1
+  }
+  ],
+  "has_more": false,
+  "url": "/v1/invoice_rendering_templates"
+}
+{{/formatJson}}

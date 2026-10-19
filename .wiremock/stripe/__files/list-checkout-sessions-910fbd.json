@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.customer}}{{#neq (jsonPath it '$.customer') request.query.customer.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.payment_intent}}{{#neq (jsonPath it '$.payment_intent') request.query.payment_intent.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.status}}{{#neq (jsonPath it '$.status') request.query.status.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{val it assign='d'}}{{#if (matches xp '(?s).*&expand\[[0-9]*\]=data[.]customer&.*')}}{{val (jsonPath d '$.customer' default='') assign='rf'}}{{#if rf}}{{#if (matches (stringFormat '%s' rf) '^cus_[A-Za-z0-9_]+$')}}{{#if (state rf context=(stringFormat 'customers%s' sfx))}}{{val (state rf context=(stringFormat 'customers%s' sfx)) assign='obj'}}{{#assign 'd'}}{{#jsonMerge d}}{"customer":{{{obj}}} }{{/jsonMerge}}{{/assign}}{{/if}}{{/if}}{{/if}}{{/if}}{{val d assign='row'}}{{#if acc}}{{val (stringFormat '%s,%s' row acc) assign='acc'}}{{else}}{{val row assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/checkout/sessions"
+}
+{{/formatJson}}

@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.account}}",
+  "object": "account",
+  "deleted": true
+}

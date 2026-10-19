@@ -1,0 +1,1 @@
+{{formData request.body 'form' urlDecode=true}}{{#formatJson}}{"object":"ephemeral_key_nonce","nonce":"ephkn_pub_test_{{randomValue type='ALPHANUMERIC' length=24}}","issuing_card":{{#if form.issuing_card}}{{{toJson form.issuing_card}}}{{else}}null{{/if}},"created":{{now format='unix'}},"expires":{{now offset='15 minutes' format='unix'}},"livemode":false }{{/formatJson}}

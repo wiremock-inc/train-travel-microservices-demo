@@ -1,0 +1,26 @@
+{{#formatJson}}
+{{val request.query.invoice.0 assign='qinv'}}{{val (lookup request.query 'lines[0][unit_amount]').0 assign='qua'}}{{val (lookup request.query 'lines[0][quantity]').0 assign='qq'}}{{val (lookup request.query 'lines[0][description]').0 assign='qd'}}{{#if qq}}{{val (math qua '*' qq) assign='cnAmount'}}{{else}}{{val qua assign='cnAmount'}}{{/if}}{{val (randomValue type='ALPHANUMERIC' length=24) assign='cnliRand'}}{
+  "object": "list",
+  "data": [
+  {
+    "id": "cnli_{{cnliRand}}",
+    "object": "credit_note_line_item",
+    "amount": {{cnAmount}},
+    "description": {{#if qd}}"{{qd}}"{{else}}null{{/if}},
+    "discount_amount": 0,
+    "discount_amounts": [],
+    "livemode": false,
+    "metadata": null,
+    "pretax_credit_amounts": [],
+    "quantity": {{#if qq}}{{qq}}{{else}}1{{/if}},
+    "tax_rates": [],
+    "taxes": [],
+    "type": "custom_line_item",
+    "unit_amount": {{#if qua}}{{qua}}{{else}}0{{/if}},
+    "unit_amount_decimal": "{{qua}}"
+  }
+  ],
+  "has_more": false,
+  "url": "/v1/credit_notes/preview/lines"
+}
+{{/formatJson}}

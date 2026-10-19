@@ -1,0 +1,1 @@
+<!doctype html><title>Redirecting</title><a href="{{val (state request.path.session context=(stringFormat 'billing_portal_sessions%s' sfx)) assign='bs'}}{{val (jsonPath bs '$.customer' default='') assign='cu'}}{{#if (jsonPath bs '$.return_url' default='')}}{{jsonPath bs '$.return_url'}}{{else}}{{request.baseUrl}}/hosted/billing_portal/{{request.path.session}}{{/if}}">Continue</a>

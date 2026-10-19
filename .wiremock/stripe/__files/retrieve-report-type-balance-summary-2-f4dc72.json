@@ -1,0 +1,16 @@
+{
+  "id": "balance.summary.2",
+  "object": "reporting.report_type",
+  "data_available_end": 1790658000,
+  "data_available_start": 1790553600,
+  "default_columns": [
+    "category",
+    "description",
+    "net_amount",
+    "currency"
+  ],
+  "livemode": false,
+  "name": "Balance Summary",
+  "updated": 1790658000,
+  "version": 2
+}

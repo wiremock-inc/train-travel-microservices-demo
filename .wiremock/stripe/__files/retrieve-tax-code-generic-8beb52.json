@@ -1,0 +1,9 @@
+{
+  "id": "{{request.path.id}}",
+  "object": "tax_code",
+  "description": "Tax code {{request.path.id}}",
+  "name": "Tax code {{request.path.id}}",
+  "requirements": {
+    "performance_location": "optional"
+  }
+}

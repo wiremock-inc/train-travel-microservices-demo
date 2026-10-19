@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state siId context=(stringFormat 'setup_intents%s' sfx)}}
+{{/formatJson}}

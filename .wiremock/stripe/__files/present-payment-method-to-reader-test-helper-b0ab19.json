@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state request.path.reader context=(stringFormat 'terminal_readers%s' sfx)}}
+{{/formatJson}}

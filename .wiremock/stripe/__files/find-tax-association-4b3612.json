@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state request.query.payment_intent.0 context=(stringFormat 'tax_associations%s' sfx)}}
+{{/formatJson}}

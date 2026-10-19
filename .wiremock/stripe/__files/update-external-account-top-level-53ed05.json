@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state request.path.id context=ctx}}
+{{/formatJson}}

@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state cnId context=(stringFormat 'credit_notes%s' sfx)}}
+{{/formatJson}}

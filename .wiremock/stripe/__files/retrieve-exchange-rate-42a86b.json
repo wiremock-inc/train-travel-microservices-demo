@@ -1,0 +1,11 @@
+{
+  "id": "{{request.path.rate_id}}",
+  "object": "exchange_rate",
+  "rates": {
+    "eur": 0.92,
+    "gbp": 0.79,
+    "huf": 367.93,
+    "brl": 5.43,
+    "cad": 1.36
+  }
+}

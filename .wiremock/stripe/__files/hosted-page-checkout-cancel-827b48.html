@@ -1,0 +1,1 @@
+<!doctype html><title>Redirecting</title><a href="{{val (state request.path.session context=(stringFormat 'checkout_sessions%s' sfx)) assign='ss'}}{{#if (jsonPath ss '$.cancel_url' default='')}}{{jsonPath ss '$.cancel_url'}}{{else}}{{request.baseUrl}}/hosted/checkout/{{request.path.session}}{{/if}}">Continue</a>

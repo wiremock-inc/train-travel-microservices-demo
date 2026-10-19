@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state request.path.customer context=(stringFormat 'cash_balances%s' sfx)}}
+{{/formatJson}}

@@ -1,0 +1,35 @@
+{
+  "id": "climsku_charm_industrial_2025",
+  "object": "climate.product",
+  "created": 1785715200,
+  "current_prices_per_metric_ton": {
+    "huf": {
+      "amount_fees": 626778,
+      "amount_subtotal": 20892613,
+      "amount_total": 21519391
+    }
+  },
+  "delivery_year": 2025,
+  "livemode": false,
+  "metric_tons_available": "999999.999",
+  "name": "Charm Industrial 2025",
+  "suppliers": [
+    {
+      "id": "climsup_charm_industrial",
+      "object": "climate.supplier",
+      "info_url": "https://frontierclimate.com/portfolio/charm-industrial",
+      "livemode": false,
+      "locations": [
+        {
+          "city": "San Francisco",
+          "country": "US",
+          "latitude": 37.7480408,
+          "longitude": -122.4057404,
+          "region": "CA"
+        }
+      ],
+      "name": "Charm Industrial",
+      "removal_pathway": "biomass_carbon_removal_and_storage"
+    }
+  ]
+}

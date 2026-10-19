@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state request.path.financial_account context=(stringFormat 'treasury_features%s' sfx)}}
+{{/formatJson}}

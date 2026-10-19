@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.webhook_endpoint}}",
+  "object": "webhook_endpoint",
+  "deleted": true
+}

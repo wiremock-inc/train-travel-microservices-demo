@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/test_helpers/test_clocks"
+}
+{{/formatJson}}

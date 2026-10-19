@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#neq (jsonPath it '$.customer') request.path.customer}}{{val false assign='keep'}}{{/neq}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/customers/{{request.path.customer}}/subscriptions"
+}
+{{/formatJson}}

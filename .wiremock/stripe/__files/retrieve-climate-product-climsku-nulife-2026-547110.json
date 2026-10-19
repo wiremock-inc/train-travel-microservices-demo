@@ -1,0 +1,35 @@
+{
+  "id": "climsku_nulife_2026",
+  "object": "climate.product",
+  "created": 1780617600,
+  "current_prices_per_metric_ton": {
+    "huf": {
+      "amount_fees": 510732,
+      "amount_subtotal": 17024393,
+      "amount_total": 17535125
+    }
+  },
+  "delivery_year": 2026,
+  "livemode": false,
+  "metric_tons_available": "992532.148",
+  "name": "NULIFE 2026",
+  "suppliers": [
+    {
+      "id": "climsup_nulife",
+      "object": "climate.supplier",
+      "info_url": "https://frontierclimate.com/portfolio/nulife",
+      "livemode": false,
+      "locations": [
+        {
+          "city": "Saskatoon",
+          "country": "CA",
+          "latitude": 52.1525491,
+          "longitude": -106.6691447,
+          "region": "Saskatchewan"
+        }
+      ],
+      "name": "NULIFE",
+      "removal_pathway": "biomass_carbon_removal_and_storage"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "txcd_20030000",
+  "object": "tax_code",
+  "description": "General category for services. Only use this if you don't have a more specific category. You should set specific tax codes on each product or service you sell. EU only: Business-to-consumer sales are taxable at origin; business-to-business are taxable at destination.",
+  "name": "General - Services",
+  "requirements": {
+    "performance_location": "optional"
+  }
+}

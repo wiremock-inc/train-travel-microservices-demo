@@ -1,0 +1,323 @@
+/*
+ * WireMock test double for Stripe Connect.js (https://connect-js.stripe.com/v1.0/connect.js).
+ *
+ * Load this from the mock API with a blocking <script> tag placed before the app bundle:
+ *
+ *   <script src="https://<mock-host>/connect-js/v1.0/connect.js"></script>
+ *
+ * @stripe/connect-js uses a pre-existing window.StripeConnect instead of loading the real script, so
+ * every embedded component then renders as a placeholder with buttons that trigger its outcomes
+ * (callbacks into the host app and state changes in the mock) rather than Stripe's real UI.
+ *
+ * An app with a Content-Security-Policy must allow the mock origin in script-src (to load this file)
+ * and in connect-src (the placeholders call the mock API).
+ *
+ * Components with an obvious data source also show a one-line summary read from the mock for the
+ * session's account (data-mock-summary): balances, payments, payouts, payouts-list,
+ * issuing-cards-list, financial-account, financial-account-transactions.
+ */
+(function () {
+  if (window.StripeConnect && window.StripeConnect.isWireMockDouble) return;
+
+  var PREFIX = 'stripe-connect-';
+  // set<Name>InternalOnly is what the npm loader calls; set<Name> is the script-tag integration.
+  var SETTER = /^set([A-Z]\w*?)(?:InternalOnly)?$/;
+  var apiBase = new URL(document.currentScript.src).origin;
+
+  // Tags known to @stripe/connect-js at the time of writing. Unknown stripe-connect-* tags are
+  // also defined on demand, so this list only matters for elements written directly in HTML.
+  var KNOWN_COMPONENTS = [
+    'account-onboarding', 'account-management', 'notification-banner', 'payments',
+    'payment-details', 'payment-disputes', 'payment-method-settings', 'disputes-list', 'payouts',
+    'payouts-list', 'payout-details', 'balances', 'instant-payouts-promotion', 'documents',
+    'issuing-card', 'issuing-cards-list', 'financial-account', 'financial-account-transactions',
+    'tax-registrations', 'tax-settings', 'balance-report', 'payout-reconciliation-report',
+  ];
+
+  // Example arguments passed to the host app's callbacks when fired from a placeholder button.
+  var SAMPLE_PAYLOADS = {
+    OnStepChange: {step: 'business_details'},
+    OnSectionOpen: {section: 'business_details'},
+    OnNotificationsChange: {total: 1, actionRequired: 1},
+    OnDisputesLoaded: {total: 0},
+    OnInstantPayoutsPromotionLoaded: {promotionShown: true},
+    OnInstantPayoutCreated: {payoutId: 'po_mock'},
+    OnReportAvailabilityLoaded: {available: true},
+    OnTaxSettingsUpdated: {id: 'taxstg_mock'},
+    OnAfterTaxRegistrationAdded: {id: 'taxreg_mock'},
+    OnAfterTaxRegistrationExpired: {id: 'taxreg_mock'},
+  };
+
+  // Outcomes beyond "fire callback X". Each runs against the element and may call the mock.
+  var OUTCOMES = {
+    'account-onboarding': [
+      {
+        id: 'complete-onboarding',
+        label: 'Complete onboarding',
+        primary: true,
+        run: function (el) {
+          return el.connector.post('complete_onboarding').then(function () {
+            el.fire('OnExit');
+          });
+        },
+      },
+      {id: 'exit', label: 'Exit without completing', run: function (el) { el.fire('OnExit'); }},
+    ],
+    'account-management': [
+      {
+        id: 'complete-onboarding',
+        label: 'Submit outstanding details',
+        run: function (el) { return el.connector.post('complete_onboarding'); },
+      },
+    ],
+  };
+  // One-line summaries: GET /connect-js/sessions/<client_secret>/summary/<component> returns a small
+  // JSON document for the session's account. A failed request just leaves the summary out.
+  function money(amount, currency) {
+    return (Number(amount || 0) / 100).toFixed(2) + ' ' + String(currency || 'usd').toUpperCase();
+  }
+  function counted(what) {
+    return function (s) { return s.count + ' ' + what + (s.count === 1 ? '' : 's'); };
+  }
+  var SUMMARIES = {
+    'balances': function (s) {
+      return 'Available ' + money(s.available, s.currency) + ', pending ' + money(s.pending, s.currency);
+    },
+    'payments': counted('payment'),
+    'payouts': counted('payout'),
+    'payouts-list': counted('payout'),
+    'issuing-cards-list': counted('card'),
+    'financial-account-transactions': counted('transaction'),
+    'financial-account': function (s) {
+      return s.financial_account ? 'Cash balance ' + money(s.cash, s.currency) + ' (' + s.financial_account + ')' : 'No financial account';
+    },
+  };
+
+  // Callbacks that the outcomes above already cover, or that fire on their own.
+  var NO_BUTTON = {OnExit: ['account-onboarding'], OnLoaderStart: true, OnLoadError: true};
+
+  function Connector(params) {
+    var self = this;
+    this.params = params;
+    this.elements = [];
+    var eager = params.metaOptions && params.metaOptions.eagerClientSecretPromise;
+    this.session = Promise.resolve(eager || params.fetchClientSecret()).then(function (secret) {
+      if (!secret) throw new Error('fetchClientSecret did not return a client secret');
+      self.clientSecret = secret;
+      return self.post('claim');
+    });
+    // Avoid an unhandled rejection; each element reports the failure through onLoadError.
+    this.session.catch(function () {});
+  }
+  Connector.prototype.post = function (action) {
+    var url = apiBase + '/connect-js/sessions/' + encodeURIComponent(this.clientSecret) + '/' + action;
+    return fetch(url, {method: 'POST'}).then(function (response) {
+      return response.json().then(function (body) {
+        if (!response.ok) throw new Error((body.error && body.error.message) || 'HTTP ' + response.status);
+        return body;
+      });
+    });
+  };
+  Connector.prototype.get = function (path) {
+    var url = apiBase + '/connect-js/sessions/' + encodeURIComponent(this.clientSecret) + '/' + path;
+    return fetch(url).then(function (response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    });
+  };
+  Connector.prototype.update = function (options) {
+    for (var key in options) this.params[key] = options[key];
+    this.elements.forEach(function (el) { el.render(); });
+  };
+
+  function title(name) {
+    return name.replace(/-/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
+  }
+  function handlerName(prop) {
+    return prop.charAt(0).toLowerCase() + prop.slice(1);
+  }
+  function node(tag, attrs, text) {
+    var el = document.createElement(tag);
+    for (var key in attrs) el.setAttribute(key, attrs[key]);
+    if (text != null) el.textContent = text;
+    return el;
+  }
+
+  // Answers every set<Name>InternalOnly call the npm loader forwards, including ones added in
+  // loader versions newer than this file.
+  var setterTrap = new Proxy(HTMLElement.prototype, {
+    get: function (target, prop, receiver) {
+      var match = typeof prop === 'string' && !(prop in target) && SETTER.exec(prop);
+      if (!match) return Reflect.get(target, prop, receiver);
+      return function (value) {
+        this.mockProps[match[1]] = value;
+        this.render();
+      };
+    },
+  });
+
+  function defineElement(tag) {
+    if (tag.indexOf(PREFIX) !== 0 || customElements.get(tag)) return;
+    var name = tag.slice(PREFIX.length);
+
+    class MockConnectElement extends HTMLElement {
+      constructor() {
+        super();
+        this.mockProps = {};
+        this.mockState = 'loading';
+      }
+      setConnector(connector) {
+        var el = this;
+        this.connector = connector;
+        connector.elements.push(this);
+        this.render();
+        connector.session.then(
+          function (session) {
+            el.session = session;
+            el.mockState = 'ready';
+            el.fire('OnLoaderStart', {elementTagName: tag});
+            if (name === 'notification-banner') el.fire('OnNotificationsChange', {total: 0, actionRequired: 0});
+            el.render();
+            el.loadSummary();
+          },
+          function (error) { el.fail(error.message); }
+        );
+      }
+      connectedCallback() { this.render(); }
+      loadSummary() {
+        var el = this;
+        if (!SUMMARIES[name]) return;
+        var account = this.mockProps.FinancialAccount;
+        var query = name.indexOf('financial-account') === 0 && typeof account === 'string' ? '?financial_account=' + encodeURIComponent(account) : '';
+        this.connector.get('summary/' + name + query).then(
+          function (summary) {
+            el.mockSummary = SUMMARIES[name](summary);
+            el.render();
+          },
+          function () {}
+        );
+      }
+      fire(prop, payload) {
+        var handler = this.mockProps[prop];
+        if (typeof handler !== 'function') return;
+        if (payload === undefined) payload = SAMPLE_PAYLOADS[prop];
+        return payload === undefined ? handler() : handler(payload);
+      }
+      fail(message) {
+        this.mockState = 'error';
+        this.mockError = message;
+        this.fire('OnLoadError', {elementTagName: tag, error: {type: 'api_error', message: message}});
+        this.render();
+      }
+      outcomes() {
+        var el = this;
+        var list = (OUTCOMES[name] || []).slice();
+        Object.keys(this.mockProps).forEach(function (prop) {
+          var skip = NO_BUTTON[prop];
+          if (typeof el.mockProps[prop] !== 'function' || skip === true || (skip && skip.indexOf(name) >= 0)) return;
+          list.push({
+            id: 'fire-' + handlerName(prop),
+            label: 'Fire ' + handlerName(prop),
+            run: function () { el.fire(prop); },
+          });
+        });
+        list.push({
+          id: 'load-error',
+          label: 'Simulate load error',
+          run: function () { el.fail('Simulated load error'); },
+        });
+        return list;
+      }
+      render() {
+        if (!this.isConnected) return;
+        var el = this;
+        var variables = (this.connector && this.connector.params.appearance && this.connector.params.appearance.variables) || {};
+        var accent = variables.colorPrimary || '#635bff';
+        var box = node('div', {
+          'data-mock-component': name,
+          'data-mock-state': this.mockState,
+          style: 'border:1px dashed ' + accent + ';border-radius:8px;padding:16px;margin:4px 0;' +
+            'font:14px/1.4 ' + (variables.fontFamily || 'system-ui,sans-serif') + ';' +
+            'color:' + (variables.colorText || '#30313d') + ';background:' + (variables.colorBackground || '#fff') + ';',
+        });
+        var heading = node('div', {style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;'});
+        heading.appendChild(node('strong', {style: 'font-size:15px;'}, title(name)));
+        heading.appendChild(node('span', {
+          style: 'font-size:11px;padding:1px 6px;border-radius:10px;color:#fff;background:' + accent + ';',
+        }, 'WireMock test double'));
+        box.appendChild(heading);
+
+        var status = this.mockState === 'loading' ? 'Loading…'
+          : this.mockState === 'error' ? 'Failed to load: ' + this.mockError
+          : 'Account ' + this.session.account;
+        box.appendChild(node('div', {'data-mock-status': '', style: 'margin:6px 0;opacity:.75;'}, status));
+
+        if (this.mockSummary && this.mockState === 'ready') {
+          box.appendChild(node('div', {'data-mock-summary': '', style: 'margin:6px 0;'}, this.mockSummary));
+        }
+
+        var settings = {};
+        Object.keys(this.mockProps).forEach(function (prop) {
+          if (typeof el.mockProps[prop] !== 'function' && el.mockProps[prop] !== undefined) settings[handlerName(prop)] = el.mockProps[prop];
+        });
+        if (Object.keys(settings).length) {
+          box.appendChild(node('pre', {
+            'data-mock-settings': '',
+            style: 'margin:6px 0;font-size:12px;white-space:pre-wrap;opacity:.75;',
+          }, JSON.stringify(settings)));
+        }
+
+        if (this.mockState === 'ready') {
+          var buttons = node('div', {style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;'});
+          this.outcomes().forEach(function (outcome) {
+            var button = node('button', {
+              type: 'button',
+              'data-mock-outcome': outcome.id,
+              style: 'padding:6px 12px;border-radius:6px;cursor:pointer;font:inherit;border:1px solid ' + accent + ';' +
+                (outcome.primary ? 'color:#fff;background:' + accent + ';' : 'color:' + accent + ';background:transparent;'),
+            }, outcome.label);
+            button.addEventListener('click', function () {
+              button.disabled = true;
+              Promise.resolve()
+                .then(function () { return outcome.run(el); })
+                .catch(function (error) { el.fail(error.message); })
+                .then(function () { button.disabled = false; el.loadSummary(); });
+            });
+            buttons.appendChild(button);
+          });
+          box.appendChild(buttons);
+        }
+        this.replaceChildren(box);
+      }
+    }
+    Object.setPrototypeOf(MockConnectElement.prototype, setterTrap);
+    customElements.define(tag, MockConnectElement);
+  }
+
+  KNOWN_COMPONENTS.forEach(function (name) { defineElement(PREFIX + name); });
+  var createElement = document.createElement;
+  document.createElement = function (tag) {
+    if (typeof tag === 'string') defineElement(tag.toLowerCase());
+    return createElement.apply(document, arguments);
+  };
+
+  var onLoad = window.StripeConnect && window.StripeConnect.onLoad;
+  window.StripeConnect = {
+    isWireMockDouble: true,
+    init: function (params) {
+      var connector = new Connector(params);
+      return {
+        connect: connector,
+        update: function (options) { connector.update(options); },
+        logout: function () { return Promise.resolve(); },
+        // The script-tag integration (no npm loader) creates components through the instance.
+        create: function (name) {
+          var element = document.createElement(PREFIX + name);
+          element.setConnector(connector);
+          return element;
+        },
+      };
+    },
+  };
+  if (typeof onLoad === 'function') onLoad();
+})();

@@ -1,0 +1,20 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "features": {
+        "card_logo": "optional",
+        "carrier_text": "optional",
+        "second_line": "optional"
+      },
+      "id": "ics_mock_standard_black",
+      "livemode": false,
+      "name": "Standard black",
+      "object": "issuing.physical_bundle",
+      "status": "active",
+      "type": "standard"
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/issuing/physical_bundles"
+}

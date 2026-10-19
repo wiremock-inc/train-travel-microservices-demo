@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.plan}}",
+  "object": "plan",
+  "deleted": true
+}

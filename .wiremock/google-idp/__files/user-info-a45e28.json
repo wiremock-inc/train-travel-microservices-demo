@@ -1,0 +1,16 @@
+{{#trim}}
+{{#assign 'accessToken'}}{{{regexExtract request.headers.Authorization.0 '[^\s]*$'}}}{{/assign}}
+{{regexExtract (base64 accessToken decode=true padding=false) '(.+?)\.\.(.+?)$' 'parts'}}
+{{formData (base64 parts.1 decode=true padding=false) 'form'}}
+{{#assign 'givenName'}}{{#if form.g}}{{{form.g}}}{{else}}Mock{{/if}}{{/assign}}
+{{#assign 'familyName'}}{{#if form.f}}{{{form.f}}}{{else}}User{{/if}}{{/assign}}
+{
+    "sub": "{{form.s}}",
+    "email": "{{base64 form.s decode=true padding=false}}",
+    "given_name": "{{{givenName}}}",
+    "family_name": "{{{familyName}}}",
+    "name": "{{{givenName}}} {{{familyName}}}",
+    "picture": "https://lh3.googleusercontent.com/a/default-user",
+    "email_verified": true
+}
+{{/trim}}

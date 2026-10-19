@@ -1,0 +1,27 @@
+{{val (state request.path.link context='login_links') assign='lk'}}{{val '' assign='ac'}}{{#if (state (jsonPath lk '$.account') context='accounts')}}{{val (state (jsonPath lk '$.account') context='accounts') assign='ac'}}{{/if}}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stripe Express dashboard — WireMock test double</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f6f8fa;color:#1a1f36;margin:0;padding:40px 16px}
+main{max-width:520px;margin:0 auto;background:#fff;border:1px solid #d5dbe1;border-radius:8px;padding:28px}
+h1{font-size:20px;margin:0 0 4px}
+.tag{display:inline-block;font-size:12px;background:#fff4d6;border:1px solid #e6c563;border-radius:4px;padding:2px 6px;margin-bottom:16px}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;font-size:14px;margin:16px 0}
+dt{color:#687385}
+dd{margin:0;word-break:break-all}
+form{margin:8px 0}
+button{width:100%;padding:10px 14px;font-size:15px;border-radius:6px;border:1px solid #c0c8d2;background:#fff;cursor:pointer}
+button.primary{background:#635bff;border-color:#635bff;color:#fff}
+p.note{font-size:13px;color:#687385}
+</style></head>
+<body><main data-mock-page="stripe-express-dashboard">
+<h1>Stripe Express dashboard</h1>
+<span class="tag">WireMock test double</span>
+<dl>
+<dt>Account</dt><dd>{{jsonPath lk '$.account'}}</dd>
+<dt>Email</dt><dd>{{#if ac}}{{jsonPath ac '$.email' default=''}}{{else}}unknown account{{/if}}</dd>
+<dt>details_submitted</dt><dd>{{#if ac}}{{jsonPath ac '$.details_submitted' default='false'}}{{else}}unknown account{{/if}}</dd>
+<dt>payouts_enabled</dt><dd>{{#if ac}}{{jsonPath ac '$.payouts_enabled' default='false'}}{{else}}unknown account{{/if}}</dd>
+</dl>
+{{#if (jsonPath lk '$.redirect_url' default='')}}<form method="post" action="/hosted/express/{{request.path.link}}/back"><button type="submit" class="primary" data-mock-outcome="back">Back</button></form>
+{{/if}}<p class="note">Stands in for the Stripe Express dashboard. It shows the connected account and nothing else.</p>
+</main></body></html>

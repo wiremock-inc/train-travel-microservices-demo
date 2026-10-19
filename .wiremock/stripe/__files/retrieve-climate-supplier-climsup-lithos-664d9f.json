@@ -1,0 +1,17 @@
+{
+  "id": "climsup_lithos",
+  "object": "climate.supplier",
+  "info_url": "https://frontierclimate.com/portfolio/lithos",
+  "livemode": false,
+  "locations": [
+    {
+      "city": "San Francisco",
+      "country": "US",
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "region": "CA"
+    }
+  ],
+  "name": "Lithos",
+  "removal_pathway": "enhanced_weathering"
+}

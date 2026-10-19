@@ -1,0 +1,17 @@
+{
+  "id": "climsup_phlair",
+  "object": "climate.supplier",
+  "info_url": "https://frontierclimate.com/portfolio/phlair",
+  "livemode": false,
+  "locations": [
+    {
+      "city": "Munich",
+      "country": "Germany",
+      "latitude": 48.2467419,
+      "longitude": 11.7582749,
+      "region": null
+    }
+  ],
+  "name": "Phlair",
+  "removal_pathway": "direct_air_capture"
+}

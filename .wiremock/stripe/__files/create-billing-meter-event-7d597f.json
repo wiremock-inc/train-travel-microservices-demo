@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state id context=(stringFormat 'meter_events%s' sfx)}}
+{{/formatJson}}

@@ -1,0 +1,35 @@
+{
+  "id": "climsku_planetary_2026",
+  "object": "climate.product",
+  "created": 1773705600,
+  "current_prices_per_metric_ton": {
+    "huf": {
+      "amount_fees": 528326,
+      "amount_subtotal": 17610881,
+      "amount_total": 18139207
+    }
+  },
+  "delivery_year": 2026,
+  "livemode": false,
+  "metric_tons_available": "1000000",
+  "name": "Planetary 2026",
+  "suppliers": [
+    {
+      "id": "climsup_planetary",
+      "object": "climate.supplier",
+      "info_url": "https://frontierclimate.com/portfolio/planetary",
+      "livemode": false,
+      "locations": [
+        {
+          "city": "Halifax",
+          "country": "CA",
+          "latitude": 44.6845291,
+          "longitude": -63.5680474,
+          "region": "Nova Scotia"
+        }
+      ],
+      "name": "Planetary",
+      "removal_pathway": "marine_carbon_removal"
+    }
+  ]
+}

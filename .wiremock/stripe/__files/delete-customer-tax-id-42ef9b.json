@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.id}}",
+  "object": "tax_id",
+  "deleted": true
+}

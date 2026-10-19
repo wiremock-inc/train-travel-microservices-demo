@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{{toJson (jsonPath (state request.path.credit_note context=(stringFormat 'credit_notes%s' sfx)) '$.lines')}}}
+{{/formatJson}}

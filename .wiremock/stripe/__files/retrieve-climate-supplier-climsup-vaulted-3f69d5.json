@@ -1,0 +1,17 @@
+{
+  "id": "climsup_vaulted",
+  "object": "climate.supplier",
+  "info_url": "https://frontierclimate.com/portfolio/vaulted",
+  "livemode": false,
+  "locations": [
+    {
+      "city": "Houston",
+      "country": "US",
+      "latitude": 29.7604,
+      "longitude": -95.3698,
+      "region": "TX"
+    }
+  ],
+  "name": "Vaulted Deep",
+  "removal_pathway": "biomass_carbon_removal_and_storage"
+}

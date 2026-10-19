@@ -1,0 +1,7 @@
+{
+  "id": "txcd_10000000",
+  "object": "tax_code",
+  "description": "A digital service provided mainly through the internet with minimal human involvement, relying on information technology. Consider more specific categories like software, digital goods, cloud services, or website services for your product (especially if you sell in the US). If you stay with this category, taxes will be similar to those for a generic digital item like downloaded music.",
+  "name": "General - Electronically Supplied Services",
+  "requirements": null
+}

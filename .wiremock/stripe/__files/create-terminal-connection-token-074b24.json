@@ -1,0 +1,7 @@
+{{#formatJson}}
+{{formData request.body 'form' urlDecode=true}}{
+  "object": "terminal.connection_token",
+  "location": {{#if form.location}}"{{form.location}}"{{else}}"tml_Grg0lAATO5r7ng"{{/if}},
+  "secret": "pst_test_{{randomValue type='ALPHANUMERIC' length=48}}"
+}
+{{/formatJson}}

@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.id}}",
+  "object": "v2.core.event_destination",
+  "deleted": true
+}

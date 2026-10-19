@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.cardholder}}{{#neq (jsonPath it '$.cardholder.id') request.query.cardholder.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.status}}{{#neq (jsonPath it '$.status') request.query.status.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.type}}{{#neq (jsonPath it '$.type') request.query.type.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/issuing/cards"
+}
+{{/formatJson}}

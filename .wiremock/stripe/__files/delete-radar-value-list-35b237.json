@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.value_list}}",
+  "object": "radar.value_list",
+  "deleted": true
+}

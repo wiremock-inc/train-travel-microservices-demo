@@ -1,0 +1,15 @@
+{{#formatJson}}
+{{formData request.body 'form' urlDecode=true}}{
+  "object": "terminal.refund",
+  "livemode": false,
+  "status": "succeeded",
+  "metadata": {{val false assign='mdAny'}}{{#each form}}{{#if (matches @key '^metadata(\[|%5B).*(\]|%5D)$')}}{{val true assign='mdAny'}}{{/if}}{{/each}}{{#if mdAny}}{
+{{val false assign='mdStarted'}}{{#each form}}{{#if (matches @key '^metadata(\[|%5B).*(\]|%5D)$')}}{{#if mdStarted}},{{/if}}"{{regexExtract @key 'metadata(?:\[|%5B)(.*?)(?:\]|%5D)$' 'mdk'}}{{mdk.0}}": "{{this}}"{{val true assign='mdStarted'}}{{/if}}{{/each}}
+}{{else}}{}{{/if}},
+  "id": "re_{{randomValue type='ALPHANUMERIC' length=24}}",
+  "amount": {{#if form.amount}}{{#if (matches form.amount '^-?[0-9]+([.][0-9]+)?$')}}{{form.amount}}{{else}}{{#if (matches form.amount '^([Tt]rue|[Ff]alse)$')}}{{lower form.amount}}{{else}}null{{/if}}{{/if}}{{else}}null{{/if}},
+  "charge": {{#if form.charge}}"{{form.charge}}"{{else}}null{{/if}},
+  "currency": "{{jsonPath (state (trim form.charge) context=(stringFormat 'charges%s' sfx)) '$.currency'}}",
+  "created": {{now format='unix'}}
+}
+{{/formatJson}}

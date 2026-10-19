@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "resource_missing",
+    "doc_url": "https://stripe.com/docs/error-codes/resource-missing",
+    "message": "No such payment link: '{{request.path.payment_link}}'",
+    "param": "payment_link",
+    "type": "invalid_request_error"
+  }
+}

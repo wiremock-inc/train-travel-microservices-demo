@@ -1,0 +1,61 @@
+{{#formatJson}}
+{{val request.query.invoice.0 assign='qinv'}}{{val (lookup request.query 'lines[0][unit_amount]').0 assign='qua'}}{{val (lookup request.query 'lines[0][quantity]').0 assign='qq'}}{{val (lookup request.query 'lines[0][description]').0 assign='qd'}}{{#if qq}}{{val (math qua '*' qq) assign='cnAmount'}}{{else}}{{val qua assign='cnAmount'}}{{/if}}{{val (randomValue type='ALPHANUMERIC' length=24) assign='cnliRand'}}{
+  "id": "cn_preview_{{randomValue type='ALPHANUMERIC' length=16}}",
+  "object": "credit_note",
+  "amount": {{cnAmount}},
+  "amount_shipping": 0,
+  "created": {{now format='unix'}},
+  "currency": "{{jsonPath (state qinv context=(stringFormat 'invoices%s' sfx)) '$.currency'}}",
+  "customer": "{{jsonPath (state qinv context=(stringFormat 'invoices%s' sfx)) '$.customer'}}",
+  "customer_account": null,
+  "customer_balance_transaction": null,
+  "discount_amount": 0,
+  "discount_amounts": [],
+  "effective_at": {{now format='unix'}},
+  "invoice": "{{qinv}}",
+  "lines": {
+    "object": "list",
+    "data": [
+    {
+    "id": "cnli_{{cnliRand}}",
+    "object": "credit_note_line_item",
+    "amount": {{cnAmount}},
+    "description": {{#if qd}}"{{qd}}"{{else}}null{{/if}},
+    "discount_amount": 0,
+    "discount_amounts": [],
+    "livemode": false,
+    "metadata": null,
+    "pretax_credit_amounts": [],
+    "quantity": {{#if qq}}{{qq}}{{else}}1{{/if}},
+    "tax_rates": [],
+    "taxes": [],
+    "type": "custom_line_item",
+    "unit_amount": {{#if qua}}{{qua}}{{else}}0{{/if}},
+    "unit_amount_decimal": "{{qua}}"
+  }
+    ],
+    "has_more": false,
+    "url": "/v1/credit_notes/preview/lines"
+  },
+  "livemode": false,
+  "memo": {{#if (lookup form 'memo')}}"{{lookup form 'memo'}}"{{else}}null{{/if}},
+  "metadata": {},
+  "number": "PREVIEW-CN-{{randomValue type='ALPHANUMERIC' length=8 uppercase=true}}",
+  "out_of_band_amount": null,
+  "pdf": "https://pay.stripe.com/credit_notes/acct_1UKeEhEGEazAXyWN/test_YWNjdF8xVUtlRWhFR0VhekFYeVdOLF9WTGJYUWttdlNQSlZGVXN0YW1DSEU3Nms5QVNycHh3LDE4MTIwMzMyMA0200P5NfCwD7/pdf?s=ap",
+  "post_payment_amount": 0,
+  "pre_payment_amount": {{cnAmount}},
+  "pretax_credit_amounts": [],
+  "reason": {{#if (lookup form 'reason')}}"{{lookup form 'reason'}}"{{else}}null{{/if}},
+  "refunds": [],
+  "shipping_cost": null,
+  "status": "issued",
+  "subtotal": {{cnAmount}},
+  "subtotal_excluding_tax": {{cnAmount}},
+  "total": {{cnAmount}},
+  "total_excluding_tax": {{cnAmount}},
+  "total_taxes": [],
+  "type": "pre_payment",
+  "voided_at": null
+}
+{{/formatJson}}

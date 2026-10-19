@@ -1,0 +1,3 @@
+{{#formatJson}}
+{{state 'platform' context=(stringFormat 'balance_settings%s' sfx)}}
+{{/formatJson}}

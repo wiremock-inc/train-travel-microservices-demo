@@ -1,0 +1,3 @@
+{{val (state id context=ctx) assign='d'}}{{#if (matches xp '(?s).*&expand\[[0-9]*\]=default_price&.*')}}{{val (jsonPath d '$.default_price' default='') assign='rf'}}{{#if rf}}{{#if (matches (stringFormat '%s' rf) '^price_[A-Za-z0-9_]+$')}}{{#if (state rf context=(stringFormat 'prices%s' sfx))}}{{val (state rf context=(stringFormat 'prices%s' sfx)) assign='obj'}}{{#assign 'd'}}{{#jsonMerge d}}{"default_price":{{{obj}}} }{{/jsonMerge}}{{/assign}}{{/if}}{{/if}}{{/if}}{{/if}}{{#formatJson}}
+{{{d}}}
+{{/formatJson}}

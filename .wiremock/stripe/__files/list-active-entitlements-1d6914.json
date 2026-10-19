@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if (jsonPath it '$.none')}}{{val false assign='keep'}}{{/if}}{{#if keep}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/entitlements/active_entitlements"
+}
+{{/formatJson}}

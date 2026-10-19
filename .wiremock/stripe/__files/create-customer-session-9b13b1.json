@@ -1,0 +1,37 @@
+{{#formatJson}}
+{{formData request.body 'form' urlDecode=true}}{{#each form}}{{#eq @key 'components[active_entitlements][enabled]'}}{{val (trim this) assign='fv_components_active_entitlements__enabled_'}}{{/eq}}{{#eq @key 'components%5Bactive_entitlements%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_active_entitlements__enabled_'}}{{/eq}}{{#eq @key 'components[buy_button][enabled]'}}{{val (trim this) assign='fv_components_buy_button__enabled_'}}{{/eq}}{{#eq @key 'components%5Bbuy_button%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_buy_button__enabled_'}}{{/eq}}{{#eq @key 'components[customer_portal][enabled]'}}{{val (trim this) assign='fv_components_customer_portal__enabled_'}}{{/eq}}{{#eq @key 'components%5Bcustomer_portal%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_customer_portal__enabled_'}}{{/eq}}{{#eq @key 'components[customer_sheet][enabled]'}}{{val (trim this) assign='fv_components_customer_sheet__enabled_'}}{{/eq}}{{#eq @key 'components%5Bcustomer_sheet%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_customer_sheet__enabled_'}}{{/eq}}{{#eq @key 'components[mobile_payment_element][enabled]'}}{{val (trim this) assign='fv_components_mobile_payment_element__enabled_'}}{{/eq}}{{#eq @key 'components%5Bmobile_payment_element%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_mobile_payment_element__enabled_'}}{{/eq}}{{#eq @key 'components[payment_element][enabled]'}}{{val (trim this) assign='fv_components_payment_element__enabled_'}}{{/eq}}{{#eq @key 'components%5Bpayment_element%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_payment_element__enabled_'}}{{/eq}}{{#eq @key 'components[pricing_table][enabled]'}}{{val (trim this) assign='fv_components_pricing_table__enabled_'}}{{/eq}}{{#eq @key 'components%5Bpricing_table%5D%5Benabled%5D'}}{{val (trim this) assign='fv_components_pricing_table__enabled_'}}{{/eq}}{{/each}}{
+  "object": "customer_session",
+  "client_secret": "cuss_secret_{{randomValue type='ALPHANUMERIC' length=48}}",
+  "components": {
+    "active_entitlements": {
+      "enabled": {{#if fv_components_active_entitlements__enabled_}}{{#if (matches fv_components_active_entitlements__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_active_entitlements__enabled_}}{{else}}{{#if (matches fv_components_active_entitlements__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_active_entitlements__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}}
+    },
+    "buy_button": {
+      "enabled": {{#if fv_components_buy_button__enabled_}}{{#if (matches fv_components_buy_button__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_buy_button__enabled_}}{{else}}{{#if (matches fv_components_buy_button__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_buy_button__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}}
+    },
+    "customer_portal": {
+      "enabled": {{#if fv_components_customer_portal__enabled_}}{{#if (matches fv_components_customer_portal__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_customer_portal__enabled_}}{{else}}{{#if (matches fv_components_customer_portal__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_customer_portal__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}}
+    },
+    "customer_sheet": {
+      "enabled": {{#if fv_components_customer_sheet__enabled_}}{{#if (matches fv_components_customer_sheet__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_customer_sheet__enabled_}}{{else}}{{#if (matches fv_components_customer_sheet__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_customer_sheet__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}},
+      "features": null
+    },
+    "mobile_payment_element": {
+      "enabled": {{#if fv_components_mobile_payment_element__enabled_}}{{#if (matches fv_components_mobile_payment_element__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_mobile_payment_element__enabled_}}{{else}}{{#if (matches fv_components_mobile_payment_element__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_mobile_payment_element__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}},
+      "features": null
+    },
+    "payment_element": {
+      "enabled": {{#if fv_components_payment_element__enabled_}}{{#if (matches fv_components_payment_element__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_payment_element__enabled_}}{{else}}{{#if (matches fv_components_payment_element__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_payment_element__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}},
+      "features": null
+    },
+    "pricing_table": {
+      "enabled": {{#if fv_components_pricing_table__enabled_}}{{#if (matches fv_components_pricing_table__enabled_ '^-?[0-9]+([.][0-9]+)?$')}}{{fv_components_pricing_table__enabled_}}{{else}}{{#if (matches fv_components_pricing_table__enabled_ '^([Tt]rue|[Ff]alse)$')}}{{lower fv_components_pricing_table__enabled_}}{{else}}false{{/if}}{{/if}}{{else}}false{{/if}}
+    }
+  },
+  "created": {{now format='unix'}},
+  "customer": "{{form.customer}}",
+  "customer_account": null,
+  "expires_at": {{now offset='30 minutes' format='unix'}},
+  "livemode": false
+}
+{{/formatJson}}

@@ -1,0 +1,21 @@
+{
+  "id": "exports.balance_history",
+  "object": "reporting.report_type",
+  "data_available_end": 1790665200,
+  "data_available_start": 1790553600,
+  "default_columns": [
+    "id",
+    "Type",
+    "Source",
+    "Amount",
+    "Fee",
+    "Net",
+    "Currency",
+    "Created (UTC)",
+    "Available On (UTC)"
+  ],
+  "livemode": false,
+  "name": "Balance History Export Query",
+  "updated": 1790665200,
+  "version": 1
+}

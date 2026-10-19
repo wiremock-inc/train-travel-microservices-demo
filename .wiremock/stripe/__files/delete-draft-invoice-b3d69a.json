@@ -1,0 +1,5 @@
+{
+  "id": "{{request.path.invoice}}",
+  "object": "invoice",
+  "deleted": true
+}

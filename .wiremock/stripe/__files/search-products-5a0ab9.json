@@ -1,0 +1,10 @@
+{{#formatJson}}
+{
+  "object": "search_result",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val it assign='d'}}{{#if (matches xp '(?s).*&expand\[[0-9]*\]=data[.]default_price&.*')}}{{val (jsonPath d '$.default_price' default='') assign='rf'}}{{#if rf}}{{#if (matches (stringFormat '%s' rf) '^price_[A-Za-z0-9_]+$')}}{{#if (state rf context=(stringFormat 'prices%s' sfx))}}{{val (state rf context=(stringFormat 'prices%s' sfx)) assign='obj'}}{{#assign 'd'}}{{#jsonMerge d}}{"default_price":{{{obj}}} }{{/jsonMerge}}{{/assign}}{{/if}}{{/if}}{{/if}}{{/if}}{{val d assign='row'}}{{#if acc}}{{val (stringFormat '%s,%s' row acc) assign='acc'}}{{else}}{{val row assign='acc'}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "next_page": null,
+  "url": "/v1/products/search"
+}
+{{/formatJson}}

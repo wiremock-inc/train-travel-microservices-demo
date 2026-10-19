@@ -1,0 +1,17 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "email": "jenny.rosen@example.com",
+      "id": "fcaown_mock",
+      "name": "Jenny Rosen",
+      "object": "financial_connections.account_owner",
+      "ownership": "fcaowns_mock_ownership",
+      "phone": null,
+      "raw_address": null,
+      "refreshed_at": 1790600000
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/financial_connections/accounts/fca_mock_checking/owners"
+}

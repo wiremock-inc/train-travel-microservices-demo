@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.status}}{{#neq (jsonPath it '$.status') request.query.status.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{val it assign='d'}}{{#if (matches xp '(?s).*&expand\[[0-9]*\]=data[.]financial_addresses[.]aba[.]account_number&.*')}}{{val (jsonPath d '$.financial_addresses[0].aba.account_number_last4' default='6789') assign='l4'}}{{val (jsonPath d '$.financial_addresses[0].aba.routing_number' default='110000000') assign='rn'}}{{#unless (matches (stringFormat '%s' rn) '^[0-9]{9}$')}}{{val '110000000' assign='rn'}}{{/unless}}{{#if (jsonPath d '$.financial_addresses[0].aba' default='')}}{{#assign 'd'}}{{#jsonMerge d}}{"financial_addresses":[{"aba":{"account_holder_name":{{{toJson (jsonPath d '$.financial_addresses[0].aba.account_holder_name' default='Account holder')}}},"account_number":"00012345{{l4}}","account_number_last4":"{{l4}}","bank_name":{{{toJson (jsonPath d '$.financial_addresses[0].aba.bank_name' default='Stripe Test Bank')}}},"routing_number":"{{rn}}"},"supported_networks":{{jsonPath d '$.financial_addresses[0].supported_networks' default='["ach","us_domestic_wire"]'}},"type":"aba"}] }{{/jsonMerge}}{{/assign}}{{/if}}{{/if}}{{val d assign='row'}}{{#if acc}}{{val (stringFormat '%s,%s' row acc) assign='acc'}}{{else}}{{val row assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/treasury/financial_accounts"
+}
+{{/formatJson}}

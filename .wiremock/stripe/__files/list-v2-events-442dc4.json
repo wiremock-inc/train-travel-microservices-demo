@@ -1,0 +1,8 @@
+{{#formatJson}}
+{
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{#unless (jsonPath it '$.deleted')}}{{#if acc}}{{val (stringFormat '%s,%s' it acc) assign='acc'}}{{else}}{{val it assign='acc'}}{{/if}}{{/unless}}{{/each}}{{{acc}}}
+  ],
+  "next_page_url": null,
+  "previous_page_url": null
+}
+{{/formatJson}}

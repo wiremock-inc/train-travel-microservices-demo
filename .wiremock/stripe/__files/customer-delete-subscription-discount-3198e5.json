@@ -1,0 +1,17 @@
+{{#formatJson}}
+{
+  "id": "{{jsonPath disc '$.id'}}",
+  "object": "discount",
+  "checkout_session": null,
+  "customer": "{{jsonPath disc '$.customer'}}",
+  "customer_account": null,
+  "deleted": true,
+  "invoice": null,
+  "invoice_item": null,
+  "promotion_code": null,
+  "source": {{{toJson (jsonPath disc '$.source')}}},
+  "start": {{jsonPath disc '$.start' default='null'}},
+  "subscription": "{{jsonPath disc '$.subscription'}}",
+  "subscription_item": null
+}
+{{/formatJson}}

@@ -1,0 +1,6 @@
+{
+  "error": {
+    "message": "No active discount for subscription: {{request.path.subscription_exposed_id}}",
+    "type": "invalid_request_error"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "acct_1UKeEhEGEazAXyWN",
+  "object": "account",
+  "business_profile": {
+    "annual_revenue": null,
+    "estimated_worker_count": null,
+    "mcc": null,
+    "minority_owned_business_designation": null,
+    "name": null,
+    "specified_commercial_transactions_act_url": null,
+    "support_address": null,
+    "support_email": null,
+    "support_phone": null,
+    "support_url": null,
+    "url": null
+  },
+  "business_type": null,
+  "capabilities": {},
+  "charges_enabled": false,
+  "controller": {
+    "type": "account"
+  },
+  "country": "HU",
+  "default_currency": "huf",
+  "details_submitted": false,
+  "email": "picimako@protonmail.com",
+  "payouts_enabled": false,
+  "settings": {
+    "bacs_debit_payments": {
+      "display_name": null,
+      "service_user_number": null
+    },
+    "branding": {
+      "icon": "",
+      "logo": null,
+      "primary_color": null,
+      "secondary_color": null
+    },
+    "card_issuing": {
+      "tos_acceptance": {
+        "date": null,
+        "ip": null
+      }
+    },
+    "card_payments": {
+      "statement_descriptor_prefix": null,
+      "statement_descriptor_prefix_kana": null,
+      "statement_descriptor_prefix_kanji": null
+    },
+    "dashboard": {
+      "display_name": "Coral Zipline",
+      "timezone": "Etc/UTC"
+    },
+    "invoices": {
+      "default_account_tax_ids": null,
+      "hosted_payment_method_save": "offer"
+    },
+    "payments": {
+      "statement_descriptor": null,
+      "statement_descriptor_kana": null,
+      "statement_descriptor_kanji": null
+    },
+    "payouts": {
+      "debit_negative_balances": true,
+      "schedule": {
+        "delay_days": 7,
+        "interval": "daily"
+      },
+      "statement_descriptor": null
+    },
+    "sepa_debit_payments": {
+      "creditor_id": "BE39ZZZCITD000000037"
+    }
+  },
+  "type": "standard"
+}

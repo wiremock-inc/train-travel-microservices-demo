@@ -1,0 +1,10 @@
+{{#formatJson}}
+{
+  "id": "mtras_test_{{randomValue type='ALPHANUMERIC' length=40}}",
+  "object": "v2.billing.meter_event_session",
+  "authentication_token": "at_test_{{randomValue type='ALPHANUMERIC' length=120}}",
+  "created": "{{now format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"}}",
+  "expires_at": "{{now offset='15 minutes' format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"}}",
+  "livemode": false
+}
+{{/formatJson}}

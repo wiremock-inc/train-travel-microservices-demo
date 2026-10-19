@@ -1,0 +1,9 @@
+{{#formatJson}}
+{
+  "object": "list",
+  "data": [{{val '' assign='acc'}}{{#each (listState ctx) as |it|}}{{val true assign='keep'}}{{#if request.query.customer}}{{#neq (jsonPath it '$.customer') request.query.customer.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.status}}{{#neq (jsonPath it '$.status') request.query.status.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if request.query.subscription}}{{#neq (jsonPath it '$.subscription') request.query.subscription.0}}{{val false assign='keep'}}{{/neq}}{{/if}}{{#if keep}}{{val it assign='row'}}{{val (jsonPath it '$.id' default='') assign='iid'}}{{val 0 assign='sub'}}{{val '' assign='any'}}{{#each (listState (stringFormat 'invoice_lines_%s%s' iid sfx)) as |l|}}{{#unless (jsonPath l '$.none' default='')}}{{val (jsonPath l '$.amount' default='0') assign='la'}}{{#if (matches (stringFormat '%s' la) '^-?[0-9]+$')}}{{val (math sub '+' la) assign='sub'}}{{val '1' assign='any'}}{{/if}}{{/unless}}{{/each}}{{#if any}}{{val (jsonPath it '$.status' default='') assign='st'}}{{#assign 'row'}}{{#jsonMerge it}}{"subtotal":{{sub}},"subtotal_excluding_tax":{{sub}},"total":{{sub}},"total_excluding_tax":{{sub}},"amount_due":{{sub}},"amount_paid":{{#eq st 'paid'}}{{sub}}{{else}}0{{/eq}},"amount_remaining":{{#eq st 'paid'}}0{{else}}{{#eq st 'void'}}0{{else}}{{sub}}{{/eq}}{{/eq}} }{{/jsonMerge}}{{/assign}}{{/if}}{{#if acc}}{{val (stringFormat '%s,%s' row acc) assign='acc'}}{{else}}{{val row assign='acc'}}{{/if}}{{/if}}{{/each}}{{{acc}}}
+  ],
+  "has_more": false,
+  "url": "/v1/invoices"
+}
+{{/formatJson}}

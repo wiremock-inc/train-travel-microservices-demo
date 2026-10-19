@@ -1,0 +1,18 @@
+{
+  "id": "connected_account_payouts.summary.1",
+  "object": "reporting.report_type",
+  "data_available_end": 1790658000,
+  "data_available_start": 1790553600,
+  "default_columns": [
+    "reporting_category",
+    "currency",
+    "count",
+    "gross",
+    "fee",
+    "net"
+  ],
+  "livemode": false,
+  "name": "Connected account payouts summary",
+  "updated": 1790658000,
+  "version": 1
+}

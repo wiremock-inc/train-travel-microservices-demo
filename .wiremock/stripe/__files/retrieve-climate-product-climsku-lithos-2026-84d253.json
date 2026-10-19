@@ -1,0 +1,35 @@
+{
+  "id": "climsku_lithos_2026",
+  "object": "climate.product",
+  "created": 1785196800,
+  "current_prices_per_metric_ton": {
+    "huf": {
+      "amount_fees": 380161,
+      "amount_subtotal": 12672036,
+      "amount_total": 13052197
+    }
+  },
+  "delivery_year": 2026,
+  "livemode": false,
+  "metric_tons_available": "999999.748",
+  "name": "Lithos 2026",
+  "suppliers": [
+    {
+      "id": "climsup_lithos",
+      "object": "climate.supplier",
+      "info_url": "https://frontierclimate.com/portfolio/lithos",
+      "livemode": false,
+      "locations": [
+        {
+          "city": "San Francisco",
+          "country": "US",
+          "latitude": 37.7749,
+          "longitude": -122.4194,
+          "region": "CA"
+        }
+      ],
+      "name": "Lithos",
+      "removal_pathway": "enhanced_weathering"
+    }
+  ]
+}

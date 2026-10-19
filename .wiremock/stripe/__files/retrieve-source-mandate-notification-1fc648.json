@@ -1,0 +1,24 @@
+{{#formatJson}}
+{
+  "acss_debit": {
+    "statement_descriptor": "string"
+  },
+  "amount": null,
+  "bacs_debit": {
+    "last4": "string"
+  },
+  "created": {{now format='unix'}},
+  "id": "{{request.path.mandate_notification}}",
+  "livemode": false,
+  "object": "source_mandate_notification",
+  "reason": "debit_initiated",
+  "sepa_debit": {
+    "creditor_identifier": "string",
+    "last4": "string",
+    "mandate_reference": "string"
+  },
+  "status": "submitted",
+  "type": "ach_credit_transfer",
+  "source": {{{state request.path.source context=(stringFormat 'sources%s' sfx)}}}
+}
+{{/formatJson}}

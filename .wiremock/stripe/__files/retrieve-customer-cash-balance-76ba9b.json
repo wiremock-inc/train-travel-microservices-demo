@@ -1,0 +1,13 @@
+{{#formatJson}}
+{{#if (state request.path.customer context=(stringFormat 'cash_balances%s' sfx))}}{{state request.path.customer context=(stringFormat 'cash_balances%s' sfx)}}{{else}}{
+  "object": "cash_balance",
+  "available": {},
+  "customer": "{{request.path.customer}}",
+  "customer_account": null,
+  "livemode": false,
+  "settings": {
+    "reconciliation_mode": "automatic",
+    "using_merchant_default": true
+  }
+}{{/if}}
+{{/formatJson}}

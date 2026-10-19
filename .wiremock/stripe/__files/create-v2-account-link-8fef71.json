@@ -1,0 +1,11 @@
+{{#formatJson}}
+{
+  "object": "v2.core.account_link",
+  "account": "{{jsonPath request.body '$.account'}}",
+  "created": "{{now format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"}}",
+  "expires_at": "{{now offset='5 minutes' format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"}}",
+  "url": "https://connect.stripe.com/d/setup/{{randomValue type='ALPHANUMERIC' length=24}}",
+  "use_case": {{{toJson (jsonPath request.body '$.use_case')}}},
+  "livemode": false
+}
+{{/formatJson}}
