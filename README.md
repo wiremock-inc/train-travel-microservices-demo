@@ -250,3 +250,8 @@ e2e/                                 Puppeteer browser journey against the runni
 docs/train-travel-microservices/     full specification documents
 postman/                             collection + environment
 ```
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE), except for the `ui/` directory, which retains
+its original [MIT license](ui/LICENSE).
