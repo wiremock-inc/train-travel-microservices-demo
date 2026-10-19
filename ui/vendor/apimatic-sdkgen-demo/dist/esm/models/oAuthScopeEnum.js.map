@@ -1,0 +1,1 @@
+{"version":3,"file":"oAuthScopeEnum.js","sourceRoot":"","sources":["../../../src/models/oAuthScopeEnum.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAEH,OAAO,EAAU,UAAU,EAAE,MAAM,WAAW,CAAC;AAE/C;;GAEG;AACH,MAAM,CAAN,IAAY,cAGX;AAHD,WAAY,cAAc;IACxB,+BAAa,CAAA;IACb,iCAAe,CAAA;AACjB,CAAC,EAHW,cAAc,KAAd,cAAc,QAGzB;AAED;;GAEG;AACH,MAAM,CAAC,MAAM,oBAAoB,GAA2B,UAAU,CACpE,cAAc,CACf,CAAC"}

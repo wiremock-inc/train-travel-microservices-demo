@@ -20,13 +20,8 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.13.6",
-    "@wiremock-inc/apimatic-sdkgen-demo": "^1.0.5",
+    "@wiremock-inc/apimatic-sdkgen-demo": "file:vendor/apimatic-sdkgen-demo",
     "pnpm": "^9.4.0",
     "solid-js": "^1.8.11"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@wiremock-inc/apimatic-sdkgen-demo@1.0.5": "patches/@wiremock-inc__apimatic-sdkgen-demo@1.0.5.patch"
-    }
   }
 }

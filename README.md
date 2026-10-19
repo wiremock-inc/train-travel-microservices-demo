@@ -44,7 +44,8 @@ see [`src/main/resources/application.yml`](src/main/resources/application.yml).
 
 A SolidJS + Vite single-page app ([`ui/`](ui/), originally
 [wiremock-inc/Train-travel-demo-UI](https://github.com/wiremock-inc/Train-travel-demo-UI)) that talks to
-the gateway through the APIMatic-generated `@wiremock-inc/apimatic-sdkgen-demo` SDK.
+the gateway through the APIMatic-generated `@wiremock-inc/apimatic-sdkgen-demo` SDK, vendored as
+built JavaScript in [`ui/vendor/`](ui/vendor/apimatic-sdkgen-demo).
 
 ### Run it
 
@@ -59,10 +60,10 @@ pnpm dev          # http://localhost:3000
 The app defaults to `http://localhost:8080` for its API host; the navbar's "Override API host" input
 points it elsewhere, and **Reset** returns to the default.
 
-> The SDK is patched via `ui/patches/` (see the commit history for the reasons: an https-only base URI
-> and a `cvc`-required response schema both conflict with the API spec). pnpm applies the patch on
-> `install`; if you ever edit it, `pnpm patch-commit` then **restart `pnpm dev`** — Vite's dependency
-> cache only re-optimizes at startup.
+> The vendored SDK carries two local fixes (see the commit history for the reasons: an https-only base
+> URI and a `cvc`-required response schema both conflict with the API spec). pnpm copies it into
+> `node_modules` on `install`, so after editing it run `pnpm install --force`, then **restart
+> `pnpm dev`** — Vite's dependency cache only re-optimizes at startup.
 
 ### Using the app
 

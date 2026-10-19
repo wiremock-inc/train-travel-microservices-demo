@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@wiremock-inc/apimatic-sdkgen-demo@1.0.5':
-    hash: uisxageknwbaneosh5mjslzr3u
-    path: patches/@wiremock-inc__apimatic-sdkgen-demo@1.0.5.patch
-
 importers:
 
   .:
@@ -17,8 +12,8 @@ importers:
         specifier: ^0.13.6
         version: 0.13.6(solid-js@1.8.11)
       '@wiremock-inc/apimatic-sdkgen-demo':
-        specifier: ^1.0.5
-        version: 1.0.5(patch_hash=uisxageknwbaneosh5mjslzr3u)
+        specifier: file:vendor/apimatic-sdkgen-demo
+        version: file:vendor/apimatic-sdkgen-demo
       pnpm:
         specifier: ^9.4.0
         version: 9.4.0
@@ -633,8 +628,8 @@ packages:
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
-  '@wiremock-inc/apimatic-sdkgen-demo@1.0.5':
-    resolution: {integrity: sha512-GcDib/efXmIICwy4u+As/KNF1W159KIZmQES12VI/OL9lzrln40Oy3N1H9Qmo9qg1POLyGXIg0hekNpJljoing==, tarball: https://npm.pkg.github.com/download/@wiremock-inc/apimatic-sdkgen-demo/1.0.5/f26c9adf402e496bd2878f109c1e1ab3991c3c49}
+  '@wiremock-inc/apimatic-sdkgen-demo@file:vendor/apimatic-sdkgen-demo':
+    resolution: {directory: vendor/apimatic-sdkgen-demo, type: directory}
     engines: {node: '>=14.17.0'}
 
   ansi-regex@5.0.1:
@@ -949,6 +944,7 @@ packages:
 
   json-ptr@3.1.1:
     resolution: {integrity: sha512-SiSJQ805W1sDUCD1+/t1/1BIrveq2Fe9HJqENxZmMCILmrPI7WhS/pePpIOx85v6/H2z1Vy7AI08GV2TzfXocg==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
@@ -1940,7 +1936,7 @@ snapshots:
 
   '@types/estree@1.0.5': {}
 
-  '@wiremock-inc/apimatic-sdkgen-demo@1.0.5(patch_hash=uisxageknwbaneosh5mjslzr3u)':
+  '@wiremock-inc/apimatic-sdkgen-demo@file:vendor/apimatic-sdkgen-demo':
     dependencies:
       '@apimatic/authentication-adapters': 0.5.4
       '@apimatic/axios-client-adapter': 0.3.5
