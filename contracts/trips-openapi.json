@@ -5,7 +5,7 @@
     "description": "Timetable and fare service serving scheduled connections between European rail stations.",
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://kvmly.wiremockapi.cloud" }],
+  "servers": [{ "url": "https://<trips-mock-id>.wiremockapi.cloud" }],
   "paths": {
     "/connections": {
       "get": {

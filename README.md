@@ -11,7 +11,7 @@ SolidJS UI that consumes the API end-to-end, including real OAuth login against 
 | Rail Reservations | REST | `Train Travel Bookings Service` (`wm-train-travel-bookings`) | Stateful stubs: KV store, per-user state contexts (`X-User-Id`), `require-state` matching |
 | PayRail | **SOAP 1.1** | `Train Travel Payments Service` (`wm-train-travel-payments`) | Unstructured mock, body-matched SOAP stubs, masked-card templating |
 | Stripe | REST + hosted page | Stripe API template | Stateful Checkout Sessions API, **hosted Checkout page test double** |
-| Mock Google IdP | OAuth2 | Google OAuth2 template (`5e5y3`) | Auth-code flow, JWKS, **RS256 ID tokens validated by the gateway** |
+| Mock Google IdP | OAuth2 | Google OAuth2 template | Auth-code flow, JWKS, **RS256 ID tokens validated by the gateway** |
 | Webhook receiver | REST sink | `Train Travel Webhook Receiver` (`wm-train-travel-webhook`) | Open-URL stub, request journal as webhook evidence |
 
 Full design specs: [`docs/train-travel-microservices/`](docs/train-travel-microservices/). The API
@@ -22,7 +22,12 @@ hand-authored stub mappings deployed in WireMock Cloud live in [`stubs/`](stubs/
 ## Prerequisites
 
 - Java 21+ (the Gradle wrapper needs Java 24 or lower to *run*; compilation targets a Java 21 toolchain)
-- The WireMock Cloud mock estate above (already deployed — the IDs above are live)
+- The WireMock Cloud mock estate above, created in your own WireMock Cloud account (the OpenAPI
+  descriptions in [`contracts/`](contracts/) and the stub mappings in [`stubs/`](stubs/) are enough to
+  recreate it). The mock URLs in this repo are `<…-mock-id>` placeholders: replace them with your mock
+  API IDs in [`application.yml`](src/main/resources/application.yml),
+  [`ui/src/lib/auth.ts`](ui/src/lib/auth.ts) and the
+  [Postman environment](postman/train-travel.postman_environment.json).
 - Node 20+ with [pnpm](https://pnpm.io) — only if you want the UI and/or the browser E2E
 
 ## Run it (gateway)
@@ -35,7 +40,7 @@ The gateway starts on `http://localhost:8080`. All downstream base URLs are conf
 see [`src/main/resources/application.yml`](src/main/resources/application.yml).
 
 > **Note on the IdP:** the gateway validates Google ID tokens against the mock IdP at
-> `https://5e5y3.wiremockapi.cloud`, and the IdP stamps the token's `iss` from whatever base URL issued it.
+> `https://<google-idp-mock-id>.wiremockapi.cloud`, and the IdP stamps the token's `iss` from whatever base URL issued it.
 > Get your tokens from that exact URL (as the script below does) or adjust
 > `spring.security.oauth2.resourceserver.jwt.issuer-uri` to match. The token's `aud` must also be the
 > app's client ID (`train-travel-demo`, set by `…jwt.audiences`).
@@ -110,13 +115,13 @@ the deliberately declined payment.
 ## The demo walkthrough (curl)
 
 Every step below is copy-pasteable. The auth flow is fully scriptable — the mock IdP's login is just a
-form POST, so no browser is needed (open `https://5e5y3.wiremockapi.cloud/o/oauth2/v2/auth?...` in a
+form POST, so no browser is needed (open `https://<google-idp-mock-id>.wiremockapi.cloud/o/oauth2/v2/auth?...` in a
 browser if you want the Google-styled page experience).
 
 ### 0. Log in (authorization code flow, scripted)
 
 ```bash
-AUTH=https://5e5y3.wiremockapi.cloud
+AUTH=https://<google-idp-mock-id>.wiremockapi.cloud
 API=http://localhost:8080
 
 # "Log in" as demo@example.com - the mock returns a 302 carrying the auth code
@@ -230,8 +235,8 @@ the whole journey.
 ## Resetting the demo
 
 Bookings accumulate in the bookings mock's per-user state contexts. In WireMock Cloud open
-`Train Travel Bookings Service` → **Reset state**, or via MCP: `reset_state` on `vkoeq`. The webhook
-receiver's journal can be cleared with `reset_request_journal` on `o9wy0`.
+`Train Travel Bookings Service` → **Reset state**, or via MCP: `reset_state` on the bookings mock. The webhook
+receiver's journal can be cleared with `reset_request_journal` on the webhook mock.
 
 ## Project layout
 

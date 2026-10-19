@@ -5,7 +5,7 @@
     "description": "Reservation-system API holding trip reservations (holds) per customer. State is scoped per holder via the X-User-Id header.",
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://vkoeq.wiremockapi.cloud" }],
+  "servers": [{ "url": "https://<bookings-mock-id>.wiremockapi.cloud" }],
   "paths": {
     "/reservations": {
       "post": {

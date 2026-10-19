@@ -20,7 +20,7 @@ the WireMock Cloud account to fill in gaps — everything non-obvious is here. C
                              REST+CSV    REST+CSV  REST+state REST      REST sink
                              (openapi)   (openapi) (openapi)  (unstr.)  (unstr.)
                                    └───────── all are WireMock Cloud mock APIs ─┘
- Auth mock (Google OAuth2 template, id 5e5y3): browser/script login → code → JWT access token
+ Auth mock (Google OAuth2 template): browser/script login → code → JWT access token
 ```
 
 **The gateway is stateless.** There is **no database and no repository layer** — nothing to persist. The only
@@ -70,17 +70,17 @@ spring:
 
 traintravel:
   public-base-url: http://localhost:8080      # used to compose all links.* URLs
-  auth-base-url: https://wm-google-….5e5y3….wiremockapi.cloud   # IdP mock (jwk-set-uri/issuer derive from this)
+  auth-base-url: https://<google-idp-mock-id>.wiremockapi.cloud   # IdP mock (jwk-set-uri/issuer derive from this)
   stations:
-    base-url: https://wm-train-travel-stations-<id>.wiremockapi.cloud
+    base-url: https://<stations-mock-id>.wiremockapi.cloud
   trips:
-    base-url: https://wm-train-travel-trips-<id>.wiremockapi.cloud
+    base-url: https://<trips-mock-id>.wiremockapi.cloud
   bookings:
-    base-url: https://wm-train-travel-bookings-<id>.wiremockapi.cloud
+    base-url: https://<bookings-mock-id>.wiremockapi.cloud
   payments:
-    base-url: https://wm-train-travel-payments-<id>.wiremockapi.cloud/payrail/v1
+    base-url: https://<payrail-mock-id>.wiremockapi.cloud/payrail/v1
   webhook:
-    url: https://wm-train-travel-webhook-<id>.wiremockapi.cloud/new-booking
+    url: https://<webhook-mock-id>.wiremockapi.cloud/new-booking
     timeout: 3s
   downstream:
     connect-timeout: 5s
@@ -190,14 +190,14 @@ processing is always correct; nothing needs streaming, batching, or shared ident
 
 | # | Mock API | Type | Hostname | Created via |
 |---|---|---|---|---|
-| 1 | Google OAuth2 template | template | `wm-…` (existing) | **Done by user in UI** — id `5e5y3` |
+| 1 | Google OAuth2 template | template | `wm-…` (existing) | **Done by user in UI** |
 | 2 | Train Travel Stations Service | openapi | `wm-train-travel-stations` | MCP: `create_mock_api` → author OpenAPI → `push` (openapi_description) → `create_data_source` (CSV) → `import_stubs_to_mock_api` |
 | 3 | Train Travel Trips Service | openapi | `wm-train-travel-trips` | as above |
 | 4 | Train Travel Bookings Service | openapi | `wm-train-travel-bookings` | MCP + `update_mock_api_settings` (state: context expression `reservations:{{request.headers.x-user-id}}`) |
 | 5 | Train Travel Payments Service (PayRail) | unstructured | `wm-train-travel-payments` | MCP: `create_mock_api` (type unstructured) → `import_stubs_to_mock_api` (the 4–5 SOAP stubs) |
 | 6 | Train Travel Webhook Receiver | unstructured | `wm-train-travel-webhook` | MCP: one open-URL POST stub |
 
-Plus: **Token stub extension on `5e5y3`** via `update_stub_mapping` (scopes in login code → JWT access
+Plus: **Token stub extension on the IdP mock** via `update_stub_mapping` (scopes in login code → JWT access
 token; exact template changes in `v1-downstream-services.md` §5).
 
 Data source CSVs: `Train Stations` (~20 rows) and `Train Connections` (~64 rows) — column lists in
@@ -212,7 +212,7 @@ receiver are the demo's webhook evidence; clear via `reset_request_journal` when
 | Dependency | Constraint | Consequence |
 |---|---|---|
 | WireMock Cloud state store | Values are JSON docs in contexts; keys listed via `listState` in **insertion order**; no querying across keys | Per-user listing needs per-user contexts (context expression); duplicate-detection on create is impossible → 409 cut; listing order = creation order (documented) |
-| WireMock Cloud `data-exists` matcher | SQL-like filter over CSV columns; ORDER BY/LIMIT/OFFSET supported (proven in `j0meq`); no geo/text-search functions | Country + route + pagination live in the mock; text search and proximity live in the gateway |
+| WireMock Cloud `data-exists` matcher | SQL-like filter over CSV columns; ORDER BY/LIMIT/OFFSET supported (proven in a scratch mock); no geo/text-search functions | Country + route + pagination live in the mock; text search and proximity live in the gateway |
 | WireMock Cloud templating | `jwt` helper signs RS256 with the mock's JWKS key; `randomValue type='UUID'`; `now`; `date offset=…`; `parseDate` | Token stub extension and PayRail stubs rely on these; booking `expiresAt` computed via `date offset` |
 | Google OAuth2 template | Access token is opaque by default; scopes openid/email/profile vocabulary; login page passes `scope` through as a form field | Token + login-handler stub extension required (§5 of downstream doc); custom `read`/`write` scopes are simply passed through the `scope` string — the template doesn't validate the vocabulary |
 | Unstructured mock type | No OpenAPI validation; stubs match on method/URL/body patterns; bodies are raw templates | SOAP matching via body `contains`/XPath; **stub priority ordering matters** (specific card stubs must outrank catch-all) |

@@ -50,17 +50,14 @@ rsync -a \
 
 rsync -a "$DEMO_DIR/overlay/" "$TARGET_DIR/"
 
-# Point the config and contracts at placeholder hosts, so the agent can't just call (or record) the
-# existing mocks. The Google IdP (5e5y3) stays: template mocks can only be created via the WireMock Cloud UI.
+# Point the config and contracts at example.com hosts, so the agent can't just call (or record) the
+# mocks. The Google IdP stays: template mocks can only be created via the WireMock Cloud UI.
 URL_PLACEHOLDERS=(
-  'wm-train-travel-stations.wiremockapi.cloud' 'stations.api.example.com'
-  'y06rz.wiremockapi.cloud'                    'stations.api.example.com'
-  'wm-train-travel-trips.wiremockapi.cloud'    'trips.api.example.com'
-  'kvmly.wiremockapi.cloud'                    'trips.api.example.com'
-  'wm-train-travel-bookings.wiremockapi.cloud' 'bookings.api.example.com'
-  'vkoeq.wiremockapi.cloud'                    'bookings.api.example.com'
-  'wm-train-travel-payments.wiremockapi.cloud' 'payments.api.example.com'
-  'wm-train-travel-webhook.wiremockapi.cloud'  'webhooks.example.com'
+  '<stations-mock-id>.wiremockapi.cloud' 'stations.api.example.com'
+  '<trips-mock-id>.wiremockapi.cloud'    'trips.api.example.com'
+  '<bookings-mock-id>.wiremockapi.cloud' 'bookings.api.example.com'
+  '<payrail-mock-id>.wiremockapi.cloud'  'payments.api.example.com'
+  '<webhook-mock-id>.wiremockapi.cloud'  'webhooks.example.com'
 )
 files_with_urls="$(grep -rIl --exclude-dir=node_modules --exclude=pnpm-lock.yaml 'wiremockapi\.cloud' "$TARGET_DIR" || true)"
 for ((i = 0; i < ${#URL_PLACEHOLDERS[@]}; i += 2)); do
@@ -71,8 +68,8 @@ done
 leftovers="$(find "$TARGET_DIR" -path '*/node_modules' -prune -o \
   \( -name '.git' -o -iname '*stub*.json' -o -path "$TARGET_DIR/docs" \) -print)"
 mentions="$(grep -rIl --exclude-dir=node_modules -e 'stubs/' -e 'docs/train-travel' "$TARGET_DIR" || true)"
-mentions+="$(grep -rIo --exclude-dir=node_modules --exclude=pnpm-lock.yaml '[a-z0-9-]*\.wiremockapi\.cloud' "$TARGET_DIR" \
-  | grep -v ':5e5y3\.wiremockapi\.cloud$' || true)"
+mentions+="$(grep -rIo --exclude-dir=node_modules --exclude=pnpm-lock.yaml '[<>a-z0-9-]*\.wiremockapi\.cloud' "$TARGET_DIR" \
+  | grep -v ':<google-idp-mock-id>\.wiremockapi\.cloud$' || true)"
 if [[ -n "$leftovers$mentions" ]]; then
   echo "Copy still contains, or points to, material that should have been removed:" >&2
   printf '%s\n' $leftovers $mentions >&2

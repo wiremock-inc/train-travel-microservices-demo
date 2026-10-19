@@ -47,7 +47,7 @@ GET /station-data?country=DE&pageSize=100&offset=0
   London St Pancras `GB-LON-STP`, Amsterdam Centraal `NL-AMS-CEN`, Zürich HB `CH-ZRH-HBF`, Wien Hbf `AT-VIE-HBF`,
   Bruxelles-Midi `BE-BRU-MID`, Madrid Atocha `ES-MAD-ATO`, Roma Termini `IT-ROM-TRM`, …).
 - One stub per operation, using the **`data-exists`** custom matcher with a SQL-style query
-  (pattern proven in the existing `j0meq` mock):
+  (pattern proven in an earlier scratch mock):
 
   ```
   countryIsoCode='{{request.query.country}}' ORDER BY stationName
@@ -104,7 +104,7 @@ GET /connections?from=DE-BER-HBF&to=FR-PAR-NOT&date=2026-10-01&page=1&pageSize=1
 ### WireMock Cloud strategy
 
 - **CSV data source** `Train Connections` — ~8 major European routes × 4 departures each × both directions
-  (~64 rows), columns (mirroring the proven `j0meq` `Train Trips` pattern, domain-renamed):
+  (~64 rows), columns (mirroring a proven `Train Trips` pattern from an earlier scratch mock, domain-renamed):
 
   ```
   connectionId, fromStationCode, toStationCode, departure_time (HH:mm), duration_minutes,
@@ -178,7 +178,7 @@ DELETE /reservations/{reservationId}
 - `expiresAt` is computed at creation by the template (`now + 1 hour`) — the mock never enforces it;
   **the gateway enforces expiry** (404 for HELD past `expiresAt`; CONFIRMED never expires).
 
-### WireMock Cloud strategy (KV state store — patterns proven in `j0meq` and WireMock Cloud docs)
+### WireMock Cloud strategy (KV state store — patterns proven in an earlier scratch mock and the WireMock Cloud docs)
 
 - **Create:** `change-state` listener → `REQUEST_VAR id = {{randomValue type='UUID'}}`,
   `REQUEST_VAR collectionContext = reservations:<x-user-id>` (or rely on the mock's context expression),
@@ -303,7 +303,7 @@ priorities so the specific-card stubs win over the catch-all.
 
 ---
 
-## 5. Auth — Google OAuth2 template mock (existing, `5e5y3`)
+## 5. Auth — Google OAuth2 template mock (existing)
 
 **Mock API:** already created from the pre-built Google OAuth2 template. Hostname is `wm-`-prefixed.
 **One extension is required** (built via MCP `update_stub_mapping` during the build phase):

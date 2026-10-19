@@ -21,6 +21,6 @@ as a mock API, generate stubs from it, then drive the gateway and its E2E agains
 any of the hand-authored stub mappings. The stubs that the currently deployed mocks were built
 with live next door, so the two can evolve separately.
 
-Not covered by a contract here: the mocked Google IdP (a pre-built WireMock Cloud template,
-`5e5y3`) and the webhook receiver (a plain POST sink, no API to describe — see
+Not covered by a contract here: the mocked Google IdP (a pre-built WireMock Cloud
+template) and the webhook receiver (a plain POST sink, no API to describe — see
 [`../stubs/webhook-stubs.json`](../stubs/webhook-stubs.json)).

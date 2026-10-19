@@ -5,7 +5,7 @@
     "description": "Internal infrastructure reference-data API serving the master list of European rail stations.",
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://y06rz.wiremockapi.cloud" }],
+  "servers": [{ "url": "https://<stations-mock-id>.wiremockapi.cloud" }],
   "paths": {
     "/station-data": {
       "get": {

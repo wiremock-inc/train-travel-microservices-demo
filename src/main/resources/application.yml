@@ -15,7 +15,7 @@ spring:
           # Mocked Google IdP (WireMock Cloud, Google OAuth2 template). OIDC discovery gives us
           # the JWKS endpoint and issuer validation. Note: tokens must be issued via this exact
           # base URL, because the IdP mints `iss` from the request's own base URL.
-          issuer-uri: https://5e5y3.wiremockapi.cloud
+          issuer-uri: https://<google-idp-mock-id>.wiremockapi.cloud
           # The bearer is an ID token, which is only meant for the client it was issued to:
           # `aud` must be the UI's OAuth client ID.
           audiences: train-travel-demo
@@ -23,21 +23,21 @@ spring:
 traintravel:
   public-base-url: http://localhost:8080
   stations:
-    base-url: https://wm-train-travel-stations.wiremockapi.cloud
+    base-url: https://<stations-mock-id>.wiremockapi.cloud
   trips:
-    base-url: https://wm-train-travel-trips.wiremockapi.cloud
+    base-url: https://<trips-mock-id>.wiremockapi.cloud
   bookings:
-    base-url: https://wm-train-travel-bookings.wiremockapi.cloud
+    base-url: https://<bookings-mock-id>.wiremockapi.cloud
   payments:
-    base-url: https://wm-train-travel-payments.wiremockapi.cloud/payrail/v1
+    base-url: https://<payrail-mock-id>.wiremockapi.cloud/payrail/v1
   stripe:
     # Stripe API + hosted Checkout page (WireMock Cloud local environment `train-travel`)
-    base-url: http://v1q0j.local.wiremock.cloud
+    base-url: http://<stripe-mock-id>.local.wiremock.cloud
     secret-key: sk_test_train_travel_demo
     # Where the hosted Checkout page sends the browser back to: the UI
     return-base-url: http://localhost:3000
   webhook:
-    url: https://wm-train-travel-webhook.wiremockapi.cloud/new-booking
+    url: https://<webhook-mock-id>.wiremockapi.cloud/new-booking
     timeout: 3s
   downstream:
     connect-timeout: 5s

@@ -50,7 +50,7 @@
 
   <wsdl:service name="PayRailService">
     <wsdl:port name="PayRailPort" binding="tns:PayRailSoap11Binding">
-      <soap:address location="https://wm-train-travel-payments.wiremockapi.cloud/payrail/v1"/>
+      <soap:address location="https://<payrail-mock-id>.wiremockapi.cloud/payrail/v1"/>
     </wsdl:port>
   </wsdl:service>
 

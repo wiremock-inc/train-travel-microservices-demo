@@ -1,5 +1,5 @@
 /**
- * OAuth login against the mocked Google IdP (WireMock Cloud, mock API 5e5y3).
+ * OAuth login against the mocked Google IdP (WireMock Cloud).
  *
  * The SDK's own authorization-code helpers hard-code the spec's placeholder auth
  * server (https://example.com/oauth), so this module implements the browser flow
@@ -9,7 +9,7 @@
  * the gateway validates locally against the IdP's JWKS.
  */
 
-const IDP_BASE_URL = 'https://5e5y3.wiremockapi.cloud';
+const IDP_BASE_URL = 'https://<google-idp-mock-id>.wiremockapi.cloud';
 const CLIENT_ID = 'train-travel-demo';
 const SCOPES = 'openid email';
 const STATE_STORAGE_KEY = 'traintravel.oauth_state';

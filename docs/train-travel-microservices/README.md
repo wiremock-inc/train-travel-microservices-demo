@@ -20,7 +20,7 @@ invented external microservices**, each of which is mocked in WireMock Cloud:
                             │          │          │          │
                             └── all mocked in WireMock Cloud ──┘
 
-   wm-google-* (mock API 5e5y3)  — Google OAuth2 template mock (auth code flow + JWKS)
+   wm-google-*                   — Google OAuth2 template mock (auth code flow + JWKS)
    wm-train-travel-webhook       — open POST sink, receives the newBooking webhook
 ```
 
@@ -51,7 +51,7 @@ list/get/delete bookings. Full journey including all failure paths: see [`v1-use
   `delete-booking`, `create-booking-payment`, plus the outbound `newBooking` webhook.
 - Real OAuth2: authorization-code flow against the Google OAuth2 template mock, RS256 JWT validation in the
   gateway, `read`/`write` scope enforcement (genuine 401/403).
-- Six WireMock Cloud mock APIs (five new + the existing IdP `5e5y3`).
+- Six WireMock Cloud mock APIs (five new + the existing IdP).
 - Demo script: README curl walkthrough **and** a Postman collection.
 
 **Out of scope (v1)**
@@ -85,7 +85,7 @@ list/get/delete bookings. Full journey including all failure paths: see [`v1-use
 | `POST /bookings/{id}/payment` | Gateway saga: Bookings mock (validate) → PayRail SOAP mock (`ProcessPayment`) → Bookings mock (`confirm`) |
 | Booking expiry (1 hour, HELD only) | Gateway (checks `expiresAt` from Bookings mock; CONFIRMED bookings never expire) |
 | `newBooking` webhook delivery | Gateway fire-and-forget POST → Webhook Receiver mock (open URL match) |
-| OAuth2 token issuance | Google OAuth2 template mock (`5e5y3`) + Token stub extension (scoped JWT access token) |
+| OAuth2 token issuance | Google OAuth2 template mock + Token stub extension (scoped JWT access token) |
 | OAuth2 token validation (401) | Spring Security resource server, JWKS from mock `/oauth2/v3/certs` |
 | Scope enforcement (403) | Spring method security on write operations (`SCOPE_write`) |
 | Public error model (RFC 7807) | Gateway `@RestControllerAdvice` — single `Problem` mapper |
