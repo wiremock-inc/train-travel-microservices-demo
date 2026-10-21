@@ -30,6 +30,8 @@ fs.rmSync(PROFILE_DIR, { recursive: true, force: true });
 const browser = await puppeteer.launch({
   executablePath: CHROME,
   headless: process.argv.includes('--headless'),
+  // the mocks may be served with self-signed certificates
+  acceptInsecureCerts: true,
   userDataDir: PROFILE_DIR,
   args: ['--no-first-run', '--no-default-browser-check', '--no-sandbox'],
 });
