@@ -41,6 +41,7 @@
           }
         }
       ],
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "method": "POST",
         "header": [],
@@ -76,6 +77,7 @@
           }
         }
       ],
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "method": "POST",
         "header": [],
@@ -108,6 +110,7 @@
           }
         }
       ],
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
@@ -135,6 +138,7 @@
           }
         }
       ],
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
@@ -162,6 +166,7 @@
           }
         }
       ],
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
@@ -193,6 +198,7 @@
           }
         }
       ],
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
@@ -210,6 +216,7 @@
     },
     {
       "name": "7. Pay booking (approved card 4242)",
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
@@ -227,6 +234,7 @@
     },
     {
       "name": "8. Double payment (400 - already paid)",
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
@@ -244,6 +252,7 @@
     },
     {
       "name": "9. Declined card (400 - booking stays HELD)",
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "POST",
@@ -261,6 +270,7 @@
     },
     {
       "name": "10. List my bookings",
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
@@ -274,6 +284,7 @@
     },
     {
       "name": "11. Past-date trips (400)",
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{id_token}}", "type": "string" }] },
         "method": "GET",
@@ -292,6 +303,7 @@
     },
     {
       "name": "12. No token (401)",
+      "protocolProfileBehavior": { "strictSSL": false },
       "request": {
         "method": "GET",
         "header": [],
